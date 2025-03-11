@@ -1,0 +1,5 @@
+{
+  "type": "command",
+  "name": "renameBoundedContext",
+  "requirementText": "As a User I can rename an Bounded Context"
+}

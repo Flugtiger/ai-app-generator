@@ -1,0 +1,5 @@
+{
+  "type": "command",
+  "name": "createBoundedContext",
+  "requirementText": "As a User I can create a new Bounded Context"
+}

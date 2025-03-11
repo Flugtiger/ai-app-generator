@@ -1,0 +1,5 @@
+{
+  "type": "command",
+  "name": "generateModel",
+  "requirementText": "As a User I can generate a domain model from all the model requirements."
+}

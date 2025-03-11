@@ -1,0 +1,4 @@
+{
+  "aggregateRoot": "",
+  "requirementText": "The Message Parser domain service can be used to parse file contents from LLM responses. To do so, it defines a template for how a LLM should output files. The Message Parser provides the template together with an example for use in system prompts. It has a method for parsing a LLM response message that returns a File Dictionary with the parsed files. All these statements regarding the Message Parser do also apply to the second functionality implemented by the Message Parser: Parsing unified diffs from a LLM response message. The client of the Message Parser decides wether the 'whole files' template is used in a system prompt, then the parsing function parsing whole file contents must be used, or the diff template is used in the system prompt, then the diff parsing method has to be used."
+}

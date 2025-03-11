@@ -1,0 +1,4 @@
+{
+  "aggregateRoot": "",
+  "requirementText": "There is an abstract domain service that handles the interactions with a LLM (chat model). It takes 'messages' as input and returns the response message from the LLM. The actual implementation is not part of the DDD model but will be part of the infrastructure layer."
+}

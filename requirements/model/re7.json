@@ -1,0 +1,4 @@
+{
+  "aggregateRoot": "",
+  "requirementText": "The Model Generator takes as input the requirements of the DDD model and generates the code of the DDD model by using a LLM. It has a method to generate the model from scratch and a method which modifies the existing model. The result of both is a specific sub-type of a Files Dictionary called 'Domain Model'. The function to modify the existing model also takes the current Domain Model as input. The Model Generator uses the abstract LLM service to generate the model. It specifies a system prompt that makes the LLM generate a clean DDD model. The response of the LLM is parsed to extract source code files from it. In function that modifies the existing model, the LLM is asked to generate unified diffs that are then parsed and applied to the input domain model. This parsing should be handled by the apropriate domain service."
+}

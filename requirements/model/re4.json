@@ -1,0 +1,4 @@
+{
+  "aggregateRoot": "",
+  "requirementText": "A Files Dictionary is a value object which contains the repository-relative paths of source code files mapped to their content."
+}

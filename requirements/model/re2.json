@@ -1,0 +1,4 @@
+{
+  "aggregateRoot": "ModelRequirement",
+  "requirementText": "As a User, I want to define requirements for a DDD model. These requirements reference the Bounded Context they are defined within. A model requirement contains arbitrary text that describes the requirement (attribute: requirementText)."
+}

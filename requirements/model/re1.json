@@ -1,0 +1,4 @@
+{
+  "aggregateRoot": "Bounded Context",
+  "requirementText": "An Bounded Context has a unique name and an ID. The ID is a string that is maximum four characters long. The name of a Bounded Context can be modified after the it was created. Model Requirements can be created from a Bounded Context. Commands can be created from a Bounded Context."
+}

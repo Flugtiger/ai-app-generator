@@ -1,0 +1,6 @@
+{
+  "type": "command",
+  "name": "createModelRequirement",
+  "aggregate": "ModelRequirement",
+  "requirementText": "As a User I can create a Requirement for a Bounded Context"
+}

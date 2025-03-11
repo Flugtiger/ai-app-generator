@@ -1,0 +1,4 @@
+{
+  "aggregateRoot": "Command",
+  "requirementText": "A Command is a specific type of interaction in the software System. It references the Bounded Context that it part of. It has a name and a description. The name and description can be modified after the Command has been created."
+}
