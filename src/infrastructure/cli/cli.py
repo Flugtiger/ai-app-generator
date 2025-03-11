@@ -28,6 +28,7 @@ from src.infrastructure.repositories.model_requirement.model_requirement_file_re
 from src.model.bounded_context.bounded_context_id import BoundedContextId
 from src.model.model_generator.model_generator import ModelGenerator
 from src.model.model_requirement.model_requirement_id import ModelRequirementId
+from src.infrastructure.llm.langchain_llm_service import LangchainLlmService
 from src.model.services.llm_service import LlmService
 
 
@@ -83,13 +84,6 @@ def save_json_file(file_path: str, data: Union[Dict, List, BaseModel]) -> None:
         raise CliError(f"Failed to save file {file_path}: {str(e)}")
 
 
-class DummyLlmService(LlmService):
-    """
-    Dummy implementation of LlmService for CLI testing.
-    In a real application, this would be replaced with an actual LLM service.
-    """
-    def generate_response(self, messages):
-        return {"role": "assistant", "content": "This is a dummy response for testing."}
 
 
 class CommandLineInterface:
@@ -112,9 +106,8 @@ class CommandLineInterface:
             self.bounded_context_repository
         )
         
-        # Initialize model generator with dummy LLM service
-        # In a real application, use a proper LLM service implementation
-        llm_service = DummyLlmService()
+        # Initialize model generator with Langchain LLM service
+        llm_service = LangchainLlmService()
         model_generator = ModelGenerator(llm_service)
         
         self.model_generator_commands = ModelGeneratorCommands(
