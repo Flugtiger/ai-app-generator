@@ -323,7 +323,7 @@ class CommandLineInterface:
             input_model = CreateModelRequirementInput(**input_data)
         elif args.bounded_context_id and args.requirement_text:
             input_model = CreateModelRequirementInput(
-                bounded_context_id=BoundedContextId(value=args.bounded_context_id),
+                bounded_context_id=args.bounded_context_id,
                 requirement_text=args.requirement_text
             )
         else:
