@@ -328,9 +328,9 @@ class CommandLineInterface:
             input_data = load_json_file(args.input_file)
             input_model = GenerateModelInput(**input_data)
         else:
-            input_model = GenerateModelInput()
-        else:
-            raise CliError("Either --input-file or --bounded-context-id must be provided")
+            # If no input file is provided, create a default input model
+            # or raise an error if additional required parameters are missing
+            raise CliError("--input-file must be provided")
         
         result = self.model_generator_commands.generate_model(input_model)
         
