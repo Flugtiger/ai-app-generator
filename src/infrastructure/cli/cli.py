@@ -6,11 +6,6 @@ from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel, ValidationError
 
-from src.application.bounded_context_commands import (
-    BoundedContextCommands,
-    CreateBoundedContextInput,
-    RenameBoundedContextInput,
-)
 from src.application.model_generator_commands import (
     GenerateModelInput,
     ModelGeneratorCommands,
@@ -19,17 +14,13 @@ from src.application.model_requirement_commands import (
     CreateModelRequirementInput,
     ModelRequirementCommands,
 )
-from src.infrastructure.repositories.bounded_context.bounded_context_file_repository import (
-    BoundedContextFileRepository,
-)
 from src.infrastructure.repositories.model_requirement.model_requirement_file_repository import (
     ModelRequirementFileRepository,
 )
-from src.model.bounded_context.bounded_context_id import BoundedContextId
-from src.model.model_generator.model_generator import ModelGenerator
 from src.model.model_requirement.model_requirement_id import ModelRequirementId
 from src.infrastructure.llm.langchain_llm_service import LangchainLlmService
 from src.model.services.llm_service import LlmService
+from src.model.services.model_generator import ModelGenerator
 
 
 class CliError(Exception):
@@ -94,13 +85,9 @@ class CommandLineInterface:
     def __init__(self):
         """Initialize the CLI with repositories and application services."""
         # Initialize repositories
-        self.bounded_context_repository = BoundedContextFileRepository()
         self.model_requirement_repository = ModelRequirementFileRepository()
         
         # Initialize application services
-        self.bounded_context_commands = BoundedContextCommands(
-            self.bounded_context_repository
-        )
         self.model_requirement_commands = ModelRequirementCommands(
             self.model_requirement_repository
         )
