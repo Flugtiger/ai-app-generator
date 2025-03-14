@@ -102,8 +102,7 @@ class CommandLineInterface:
             self.bounded_context_repository
         )
         self.model_requirement_commands = ModelRequirementCommands(
-            self.model_requirement_repository,
-            self.bounded_context_repository
+            self.model_requirement_repository
         )
         
         # Initialize model generator with Langchain LLM service
@@ -111,9 +110,8 @@ class CommandLineInterface:
         model_generator = ModelGenerator(llm_service)
         
         self.model_generator_commands = ModelGeneratorCommands(
-            model_generator,
             self.model_requirement_repository,
-            self.bounded_context_repository
+            model_generator
         )
         
         # Set up argument parser
@@ -179,11 +177,6 @@ class CommandLineInterface:
             help="Path to JSON file with input data"
         )
         create_req_parser.add_argument(
-            "--bounded-context-id", 
-            type=str, 
-            help="ID of the bounded context"
-        )
-        create_req_parser.add_argument(
             "--requirement-text", 
             type=str, 
             help="Text of the requirement"
@@ -198,11 +191,6 @@ class CommandLineInterface:
             "--input-file", 
             type=str, 
             help="Path to JSON file with input data"
-        )
-        gen_model_parser.add_argument(
-            "--bounded-context-id", 
-            type=str, 
-            help="ID of the bounded context"
         )
         gen_model_parser.add_argument(
             "--output-dir", 
@@ -315,9 +303,8 @@ class CommandLineInterface:
         if args.input_file:
             input_data = load_json_file(args.input_file)
             input_model = CreateModelRequirementInput(**input_data)
-        elif args.bounded_context_id and args.requirement_text:
+        elif args.requirement_text:
             input_model = CreateModelRequirementInput(
-                bounded_context_id=args.bounded_context_id,
                 requirement_text=args.requirement_text
             )
         else:
@@ -340,10 +327,8 @@ class CommandLineInterface:
         if args.input_file:
             input_data = load_json_file(args.input_file)
             input_model = GenerateModelInput(**input_data)
-        elif args.bounded_context_id:
-            input_model = GenerateModelInput(
-                bounded_context_id=args.bounded_context_id,
-            )
+        else:
+            input_model = GenerateModelInput()
         else:
             raise CliError("Either --input-file or --bounded-context-id must be provided")
         
