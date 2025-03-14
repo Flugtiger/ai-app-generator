@@ -116,42 +116,6 @@ class CommandLineInterface:
         )
         subparsers = parser.add_subparsers(dest="command", help="Command to execute")
         
-        # Create bounded context command
-        create_bc_parser = subparsers.add_parser(
-            "create-bounded-context", 
-            help="Create a new bounded context"
-        )
-        create_bc_parser.add_argument(
-            "--input-file", 
-            type=str, 
-            help="Path to JSON file with input data"
-        )
-        create_bc_parser.add_argument(
-            "--name", 
-            type=str, 
-            help="Name of the bounded context"
-        )
-        
-        # Rename bounded context command
-        rename_bc_parser = subparsers.add_parser(
-            "rename-bounded-context", 
-            help="Rename an existing bounded context"
-        )
-        rename_bc_parser.add_argument(
-            "--input-file", 
-            type=str, 
-            help="Path to JSON file with input data"
-        )
-        rename_bc_parser.add_argument(
-            "--id", 
-            type=str, 
-            help="ID of the bounded context"
-        )
-        rename_bc_parser.add_argument(
-            "--new-name", 
-            type=str, 
-            help="New name for the bounded context"
-        )
         
         # Create model requirement command
         create_req_parser = subparsers.add_parser(
@@ -209,11 +173,7 @@ class CommandLineInterface:
         
         try:
             # Dispatch to the appropriate command handler
-            if args.command == "create-bounded-context":
-                return self._handle_create_bounded_context(args)
-            elif args.command == "rename-bounded-context":
-                return self._handle_rename_bounded_context(args)
-            elif args.command == "create-model-requirement":
+            if args.command == "create-model-requirement":
                 return self._handle_create_model_requirement(args)
             elif args.command == "generate-model":
                 return self._handle_generate_model(args)
@@ -230,52 +190,6 @@ class CommandLineInterface:
             print(f"Unexpected error: {str(e)}")
             return 1
     
-    def _handle_create_bounded_context(self, args) -> int:
-        """
-        Handle the create-bounded-context command.
-        
-        Args:
-            args: Command-line arguments
-            
-        Returns:
-            Exit code (0 for success)
-        """
-        if args.input_file:
-            input_data = load_json_file(args.input_file)
-            input_model = CreateBoundedContextInput(**input_data)
-        elif args.name:
-            input_model = CreateBoundedContextInput(name=args.name)
-        else:
-            raise CliError("Either --input-file or --name must be provided")
-        
-        result = self.bounded_context_commands.create_bounded_context(input_model)
-        print(f"Created bounded context: {result.json(indent=2)}")
-        return 0
-    
-    def _handle_rename_bounded_context(self, args) -> int:
-        """
-        Handle the rename-bounded-context command.
-        
-        Args:
-            args: Command-line arguments
-            
-        Returns:
-            Exit code (0 for success)
-        """
-        if args.input_file:
-            input_data = load_json_file(args.input_file)
-            input_model = RenameBoundedContextInput(**input_data)
-        elif args.id and args.new_name:
-            input_model = RenameBoundedContextInput(
-                bounded_context_id=BoundedContextId(value=args.id),
-                new_name=args.new_name
-            )
-        else:
-            raise CliError("Either --input-file or both --id and --new-name must be provided")
-        
-        result = self.bounded_context_commands.rename_bounded_context(input_model)
-        print(f"Renamed bounded context: {result.json(indent=2)}")
-        return 0
     
     def _handle_create_model_requirement(self, args) -> int:
         """
