@@ -1,0 +1,7 @@
+setup.py
+ddd_model_generator.egg-info/PKG-INFO
+ddd_model_generator.egg-info/SOURCES.txt
+ddd_model_generator.egg-info/dependency_links.txt
+ddd_model_generator.egg-info/entry_points.txt
+ddd_model_generator.egg-info/requires.txt
+ddd_model_generator.egg-info/top_level.txt

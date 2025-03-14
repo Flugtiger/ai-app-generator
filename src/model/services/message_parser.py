@@ -1,19 +1,21 @@
-import re
-from typing import Dict, List, Optional
-
+from typing import Dict, List, Any
 from src.model.value_objects.files_dictionary import FilesDictionary
-from src.model.value_objects.message import Message
+import re
 
 
 class MessageParser:
     """
     Domain service for parsing file contents and diffs from LLM responses.
+    Provides templates for how a LLM should output files and diffs.
     """
     
     @staticmethod
-    def get_file_template() -> str:
+    def get_file_template_with_example() -> str:
         """
-        Returns the template for how an LLM should output files.
+        Returns the template for how a LLM should output files, along with an example.
+        
+        Returns:
+            A string containing the template and example.
         """
         return """
 You will output the content of each file necessary to achieve the goal, including ALL code.
@@ -35,78 +37,84 @@ SOF```
 print("Hello World")
 ```EOF
 """
-
+    
     @staticmethod
-    def get_diff_template() -> str:
+    def get_diff_template_with_example() -> str:
         """
-        Returns the template for how an LLM should output diffs.
+        Returns the template for how a LLM should output diffs, along with an example.
+        
+        Returns:
+            A string containing the template and example.
         """
         return """
-You will output unified diffs for each file that needs to be modified.
+You will output the changes needed as unified diffs.
 Represent diffs like so:
 
 FILENAME
 SOF```
-@@ -line_number,number_of_lines +line_number,number_of_lines @@
+@@ -start_line,num_lines +start_line,num_lines @@
  unchanged line
 -removed line
 +added line
  unchanged line
 ```EOF
 
-The following tokens must be replaced like so:
-FILENAME is the lowercase combined path and file name including the file extension
-
 Example representation of a diff:
 
 src/hello_world.py
 SOF```
-@@ -1,1 +1,1 @@
--print("Hello World")
-+print("Hello, World!")
+@@ -1,1 +1,2 @@
+ print("Hello World")
++print("Goodbye World")
 ```EOF
 """
-
+    
     @staticmethod
-    def parse_files(response: Message) -> FilesDictionary:
+    def parse_files_from_message(message: Dict[str, Any]) -> FilesDictionary:
         """
-        Parses file contents from an LLM response message.
+        Parses file contents from a LLM response message.
         
         Args:
-            response: LLM response message
+            message: The LLM response message.
             
         Returns:
-            FilesDictionary with the parsed files
+            A FilesDictionary containing the parsed files.
         """
+        assert message and 'content' in message, "Invalid message format"
+        content = message['content']
+        
         files_dict = FilesDictionary()
         
         # Regular expression to match file blocks
         pattern = r'([^\n]+)\nSOF```\n(.*?)\n```EOF'
-        matches = re.finditer(pattern, response.content, re.DOTALL)
+        matches = re.finditer(pattern, content, re.DOTALL)
         
         for match in matches:
             filename = match.group(1).strip()
-            content = match.group(2)
-            files_dict.add_file(filename, content)
+            file_content = match.group(2)
+            files_dict.add_file(filename, file_content)
         
         return files_dict
-
+    
     @staticmethod
-    def parse_diffs(response: Message) -> Dict[str, str]:
+    def parse_diffs_from_message(message: Dict[str, Any]) -> Dict[str, str]:
         """
-        Parses unified diffs from an LLM response message.
+        Parses unified diffs from a LLM response message.
         
         Args:
-            response: LLM response message
+            message: The LLM response message.
             
         Returns:
-            Dictionary mapping filenames to diff content
+            A dictionary mapping filenames to their diff content.
         """
+        assert message and 'content' in message, "Invalid message format"
+        content = message['content']
+        
         diffs = {}
         
         # Regular expression to match diff blocks
         pattern = r'([^\n]+)\nSOF```\n(.*?)\n```EOF'
-        matches = re.finditer(pattern, response.content, re.DOTALL)
+        matches = re.finditer(pattern, content, re.DOTALL)
         
         for match in matches:
             filename = match.group(1).strip()

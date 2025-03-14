@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List
-
+from typing import Optional
 from src.model.command.command import Command
 from src.model.command.command_id import CommandId
-from src.model.bounded_context.bounded_context_id import BoundedContextId
 
 
 class CommandRepository(ABC):
@@ -17,10 +15,10 @@ class CommandRepository(ABC):
         Retrieves a Command by its ID.
         
         Args:
-            id: ID of the Command to retrieve
+            id: The ID of the Command to retrieve.
             
         Returns:
-            The Command if found, None otherwise
+            The Command if found, None otherwise.
         """
         pass
     
@@ -30,19 +28,16 @@ class CommandRepository(ABC):
         Saves a Command to the repository.
         
         Args:
-            command: Command to save
+            command: The Command to save.
         """
         pass
     
     @abstractmethod
-    def get_by_bounded_context_id(self, bounded_context_id: BoundedContextId) -> List[Command]:
+    def get_all(self) -> list[Command]:
         """
-        Retrieves all Commands for a given BoundedContext.
+        Retrieves all Commands from the repository.
         
-        Args:
-            bounded_context_id: ID of the BoundedContext
-            
         Returns:
-            List of Commands for the BoundedContext
+            A list of all Commands.
         """
         pass

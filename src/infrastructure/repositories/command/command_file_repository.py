@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import List, Optional, Type
 
 from src.infrastructure.repositories.file_based_repository import FileBasedRepository
-from src.model.bounded_context.bounded_context_id import BoundedContextId
 from src.model.command.command import Command
 from src.model.command.command_id import CommandId
 from src.model.command.command_repository import CommandRepository
@@ -65,15 +64,3 @@ class CommandFileRepository(FileBasedRepository[Command, CommandId], CommandRepo
         """
         super().save(command)
     
-    def get_by_bounded_context_id(self, bounded_context_id: BoundedContextId) -> List[Command]:
-        """
-        Retrieves all Commands for a given BoundedContext.
-        
-        Args:
-            bounded_context_id: ID of the BoundedContext
-            
-        Returns:
-            List of Commands for the BoundedContext
-        """
-        all_commands = super().get_all()
-        return [command for command in all_commands if command.bounded_context_id == bounded_context_id]

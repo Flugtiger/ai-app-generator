@@ -1,0 +1,281 @@
+
+2025-03-09T10:17:30.073584
+================================ System Message ================================
+
+You will get information about a codebase that is currently on disk in the current folder.
+The user will ask you to write a script that runs the code in a specific way.
+You will answer with code blocks that include all the necessary terminal commands.
+Do not install globally. Do not use sudo.
+Do not explain the code, just give the commands.
+Do not use placeholders, use example values (like . for a folder argument) if necessary.
+
+
+================================ Human Message =================================
+
+
+        Make a unix script that
+        a) installs dependencies
+        b) runs all necessary parts of the codebase (in parallel if necessary)
+        
+Information about the codebase:
+
+```
+File: src/domain/aggregates/aggregate.py
+1 from pydantic import BaseModel, Field
+2 from typing import Optional
+3 import uuid
+4 from src.domain.value_objects.aggregate_id import AggregateId
+5 from src.domain.aggregates.aggregate_requirement import AggregateRequirement
+6 from src.domain.aggregates.command import Command
+7 
+8 
+9 class Aggregate(BaseModel):
+10     """
+11     Represents an Aggregate in the DDD model.
+12     An Aggregate has a unique name and ID.
+13     """
+14     id: AggregateId
+15     name: str
+16 
+17     def __init__(self, name: str, id: Optional[AggregateId] = None, **data):
+18         """
+19         Initialize a new Aggregate with a name and optionally an ID.
+20         If no ID is provided, a new one will be generated.
+21         """
+22         if id is None:
+23             id = AggregateId(uuid.uuid4())
+24         super().__init__(id=id, name=name, **data)
+25 
+26     def modify_name(self, new_name: str) -> None:
+27         """
+28         Modify the name of the Aggregate.
+29         """
+30         assert new_name, "New name cannot be empty"
+31         self.name = new_name
+32 
+33     def create_requirement(self, requirement_text: str) -> AggregateRequirement:
+34         """
+35         Create a new AggregateRequirement for this Aggregate.
+36         """
+37         assert requirement_text, "Requirement text cannot be empty"
+38         return AggregateRequirement(
+39             aggregate_id=self.id,
+40             requirement_text=requirement_text
+41         )
+42 
+43     def create_command(self, name: str) -> Command:
+44         """
+45         Create a new Command that acts upon this Aggregate.
+46         """
+47         assert name, "Command name cannot be empty"
+48         return Command(
+49             aggregate_id=self.id,
+50             name=name
+51         )
+
+File: src/domain/aggregates/aggregate_requirement.py
+1 from pydantic import BaseModel
+2 from typing import Optional
+3 import uuid
+4 from src.domain.value_objects.aggregate_id import AggregateId
+5 from src.domain.value_objects.aggregate_requirement_id import AggregateRequirementId
+6 
+7 
+8 class AggregateRequirement(BaseModel):
+9     """
+10     Represents a requirement for an Aggregate in the DDD model.
+11     It references the main aggregate that it affects and contains text describing the requirement.
+12     """
+13     id: AggregateRequirementId
+14     aggregate_id: AggregateId
+15     requirement_text: str
+16 
+17     def __init__(self, aggregate_id: AggregateId, requirement_text: str, 
+18                  id: Optional[AggregateRequirementId] = None, **data):
+19         """
+20         Initialize a new AggregateRequirement with a reference to an Aggregate and requirement text.
+21         If no ID is provided, a new one will be generated.
+22         """
+23         if id is None:
+24             id = AggregateRequirementId(uuid.uuid4())
+25         super().__init__(id=id, aggregate_id=aggregate_id, requirement_text=requirement_text, **data)
+
+File: src/domain/aggregates/command.py
+1 from pydantic import BaseModel
+2 from typing import Optional
+3 import uuid
+4 from src.domain.value_objects.aggregate_id import AggregateId
+5 from src.domain.value_objects.command_id import CommandId
+6 
+7 
+8 class Command(BaseModel):
+9     """
+10     Represents a Command in the DDD model.
+11     A Command is a specific type of interaction in the software system.
+12     It references the Aggregate that it acts upon and has a name.
+13     """
+14     id: CommandId
+15     aggregate_id: AggregateId
+16     name: str
+17 
+18     def __init__(self, aggregate_id: AggregateId, name: str, 
+19                  id: Optional[CommandId] = None, **data):
+20         """
+21         Initialize a new Command with a reference to an Aggregate and a name.
+22         If no ID is provided, a new one will be generated.
+23         """
+24         if id is None:
+25             id = CommandId(uuid.uuid4())
+26         super().__init__(id=id, aggregate_id=aggregate_id, name=name, **data)
+27 
+28     def modify_name(self, new_name: str) -> None:
+29         """
+30         Modify the name of the Command.
+31         """
+32         assert new_name, "New name cannot be empty"
+33         self.name = new_name
+
+File: src/domain/value_objects/aggregate_id.py
+1 from pydantic import BaseModel
+2 import uuid
+3 from typing import Union
+4 
+5 
+6 class AggregateId(BaseModel):
+7     """
+8     Value object representing the ID of an Aggregate.
+9     """
+10     value: uuid.UUID
+11 
+12     def __init__(self, value: Union[uuid.UUID, str]):
+13         """
+14         Initialize a new AggregateId with a UUID.
+15         Accepts either a UUID object or a string representation of a UUID.
+16         """
+17         if isinstance(value, str):
+18             value = uuid.UUID(value)
+19         super().__init__(value=value)
+20 
+21     def __str__(self) -> str:
+22         """
+23         Return a string representation of the AggregateId.
+24         The prefix 'agg_' indicates that this ID belongs to an Aggregate.
+25         """
+26         return f"agg_{self.value}"
+27 
+28     def __eq__(self, other):
+29         if not isinstance(other, AggregateId):
+30             return False
+31         return self.value == other.value
+
+File: src/domain/value_objects/aggregate_requirement_id.py
+1 from pydantic import BaseModel
+2 import uuid
+3 from typing import Union
+4 
+5 
+6 class AggregateRequirementId(BaseModel):
+7     """
+8     Value object representing the ID of an AggregateRequirement.
+9     """
+10     value: uuid.UUID
+11 
+12     def __init__(self, value: Union[uuid.UUID, str]):
+13         """
+14         Initialize a new AggregateRequirementId with a UUID.
+15         Accepts either a UUID object or a string representation of a UUID.
+16         """
+17         if isinstance(value, str):
+18             value = uuid.UUID(value)
+19         super().__init__(value=value)
+20 
+21     def __str__(self) -> str:
+22         """
+23         Return a string representation of the AggregateRequirementId.
+24         The prefix 'req_' indicates that this ID belongs to an AggregateRequirement.
+25         """
+26         return f"req_{self.value}"
+27 
+28     def __eq__(self, other):
+29         if not isinstance(other, AggregateRequirementId):
+30             return False
+31         return self.value == other.value
+
+File: src/domain/value_objects/command_id.py
+1 from pydantic import BaseModel
+2 import uuid
+3 from typing import Union
+4 
+5 
+6 class CommandId(BaseModel):
+7     """
+8     Value object representing the ID of a Command.
+9     """
+10     value: uuid.UUID
+11 
+12     def __init__(self, value: Union[uuid.UUID, str]):
+13         """
+14         Initialize a new CommandId with a UUID.
+15         Accepts either a UUID object or a string representation of a UUID.
+16         """
+17         if isinstance(value, str):
+18             value = uuid.UUID(value)
+19         super().__init__(value=value)
+20 
+21     def __str__(self) -> str:
+22         """
+23         Return a string representation of the CommandId.
+24         The prefix 'cmd_' indicates that this ID belongs to a Command.
+25         """
+26         return f"cmd_{self.value}"
+27 
+28     def __eq__(self, other):
+29         if not isinstance(other, CommandId):
+30             return False
+31         return self.value == other.value
+
+File: src/domain/__init__.py
+1 # Domain package initialization
+
+File: src/domain/aggregates/__init__.py
+1 # Aggregates package initialization
+
+File: src/domain/value_objects/__init__.py
+1 # Value objects package initialization
+
+```
+
+================================== Ai Message ==================================
+
+```bash
+#!/bin/bash
+
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate
+
+# Install dependencies
+pip install pydantic
+
+# Create a simple test script to run the code
+cat > test_run.py << 'EOF'
+from src.domain.aggregates.aggregate import Aggregate
+
+# Create an aggregate
+agg = Aggregate(name="Test Aggregate")
+print(f"Created aggregate: {agg.name} with ID: {agg.id}")
+
+# Create a requirement
+req = agg.create_requirement("This is a test requirement")
+print(f"Created requirement: {req.requirement_text} with ID: {req.id}")
+
+# Create a command
+cmd = agg.create_command("TestCommand")
+print(f"Created command: {cmd.name} with ID: {cmd.id}")
+EOF
+
+# Run the test script
+python test_run.py
+```

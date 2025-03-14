@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List
-
+from typing import Optional
 from src.model.model_requirement.model_requirement import ModelRequirement
 from src.model.model_requirement.model_requirement_id import ModelRequirementId
-from src.model.bounded_context.bounded_context_id import BoundedContextId
 
 
 class ModelRequirementRepository(ABC):
@@ -17,10 +15,10 @@ class ModelRequirementRepository(ABC):
         Retrieves a ModelRequirement by its ID.
         
         Args:
-            id: ID of the ModelRequirement to retrieve
+            id: The ID of the ModelRequirement to retrieve.
             
         Returns:
-            The ModelRequirement if found, None otherwise
+            The ModelRequirement if found, None otherwise.
         """
         pass
     
@@ -30,19 +28,16 @@ class ModelRequirementRepository(ABC):
         Saves a ModelRequirement to the repository.
         
         Args:
-            model_requirement: ModelRequirement to save
+            model_requirement: The ModelRequirement to save.
         """
         pass
     
     @abstractmethod
-    def get_by_bounded_context_id(self, bounded_context_id: BoundedContextId) -> List[ModelRequirement]:
+    def get_all(self) -> list[ModelRequirement]:
         """
-        Retrieves all ModelRequirements for a given BoundedContext.
+        Retrieves all ModelRequirements from the repository.
         
-        Args:
-            bounded_context_id: ID of the BoundedContext
-            
         Returns:
-            List of ModelRequirements for the BoundedContext
+            A list of all ModelRequirements.
         """
         pass

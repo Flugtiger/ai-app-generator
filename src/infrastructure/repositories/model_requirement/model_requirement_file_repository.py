@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import List, Optional, Type
 
 from src.infrastructure.repositories.file_based_repository import FileBasedRepository
-from src.model.bounded_context.bounded_context_id import BoundedContextId
 from src.model.model_requirement.model_requirement import ModelRequirement
 from src.model.model_requirement.model_requirement_id import ModelRequirementId
 from src.model.model_requirement.model_requirement_repository import ModelRequirementRepository
@@ -65,15 +64,3 @@ class ModelRequirementFileRepository(FileBasedRepository[ModelRequirement, Model
         """
         super().save(model_requirement)
     
-    def get_by_bounded_context_id(self, bounded_context_id: BoundedContextId) -> List[ModelRequirement]:
-        """
-        Retrieves all ModelRequirements for a given BoundedContext.
-        
-        Args:
-            bounded_context_id: ID of the BoundedContext
-            
-        Returns:
-            List of ModelRequirements for the BoundedContext
-        """
-        all_requirements = super().get_all()
-        return [req for req in all_requirements if req.bounded_context_id == bounded_context_id]

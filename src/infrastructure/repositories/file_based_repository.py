@@ -58,7 +58,7 @@ class FileBasedRepository(Generic[T, ID], ABC):
         Returns:
             The file path where the entity is stored
         """
-        return self.base_dir / f"{id.json()}.json"
+        return self.base_dir / f"{str(id)}.json"
     
     def save(self, entity: T) -> None:
         """

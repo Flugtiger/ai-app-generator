@@ -1,0 +1,2 @@
+[console_scripts]
+ddd-model-generator = src.infrastructure.cli.cli:main

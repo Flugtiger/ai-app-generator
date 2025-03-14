@@ -205,12 +205,6 @@ class CommandLineInterface:
             help="ID of the bounded context"
         )
         gen_model_parser.add_argument(
-            "--requirement-ids", 
-            type=str, 
-            nargs="+", 
-            help="IDs of the requirements to include"
-        )
-        gen_model_parser.add_argument(
             "--output-dir", 
             type=str, 
             default="generated_models", 
@@ -346,13 +340,12 @@ class CommandLineInterface:
         if args.input_file:
             input_data = load_json_file(args.input_file)
             input_model = GenerateModelInput(**input_data)
-        elif args.bounded_context_id and args.requirement_ids:
+        elif args.bounded_context_id:
             input_model = GenerateModelInput(
-                bounded_context_id=BoundedContextId(value=args.bounded_context_id),
-                requirement_ids=[ModelRequirementId(value=req_id) for req_id in args.requirement_ids]
+                bounded_context_id=args.bounded_context_id,
             )
         else:
-            raise CliError("Either --input-file or both --bounded-context-id and --requirement-ids must be provided")
+            raise CliError("Either --input-file or --bounded-context-id must be provided")
         
         result = self.model_generator_commands.generate_model(input_model)
         

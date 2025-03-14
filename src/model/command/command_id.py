@@ -1,5 +1,5 @@
-import uuid
 from pydantic import BaseModel
+import uuid
 
 
 class CommandId(BaseModel):
@@ -8,12 +8,18 @@ class CommandId(BaseModel):
     """
     value: str
 
-    def __str__(self) -> str:
-        return f"CMD-{self.value}"
-
-    @classmethod
-    def generate(cls) -> 'CommandId':
+    def __init__(self, value: str):
         """
-        Generates a new random CommandId.
+        Initialize a new CommandId.
+        Validates that the value is a valid UUID string.
         """
-        return cls(value=str(uuid.uuid4()))
+        # Validate that the value is a valid UUID
+        try:
+            uuid.UUID(value)
+        except ValueError:
+            raise ValueError(f"CommandId must be a valid UUID, got {value}")
+        
+        super().__init__(value=value)
+    
+    def __str__(self):
+        return self.value
