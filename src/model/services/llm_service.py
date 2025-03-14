@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any
+from typing import List
+from src.model.value_objects.message import Message
 
 
 class LlmService(ABC):
@@ -10,15 +11,14 @@ class LlmService(ABC):
     """
     
     @abstractmethod
-    def generate_response(self, messages: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def generate_response(self, messages: List[Message]) -> Message:
         """
         Generates a response from the LLM based on the provided messages.
         
         Args:
-            messages: A list of message objects to send to the LLM.
-                     Each message is a dictionary with at least 'role' and 'content' keys.
+            messages: A list of Message objects to send to the LLM.
             
         Returns:
-            The response message from the LLM as a dictionary.
+            The response Message from the LLM.
         """
         pass

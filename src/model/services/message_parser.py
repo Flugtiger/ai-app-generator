@@ -1,5 +1,6 @@
-from typing import Dict, List, Any
+from typing import Dict, List
 from src.model.value_objects.files_dictionary import FilesDictionary
+from src.model.value_objects.message import Message
 import re
 
 
@@ -70,7 +71,7 @@ SOF```
 """
     
     @staticmethod
-    def parse_files_from_message(message: Dict[str, Any]) -> FilesDictionary:
+    def parse_files_from_message(message: Message) -> FilesDictionary:
         """
         Parses file contents from a LLM response message.
         
@@ -80,8 +81,8 @@ SOF```
         Returns:
             A FilesDictionary containing the parsed files.
         """
-        assert message and 'content' in message, "Invalid message format"
-        content = message['content']
+        assert message and message.content, "Invalid message format"
+        content = message.content
         
         files_dict = FilesDictionary()
         
@@ -97,7 +98,7 @@ SOF```
         return files_dict
     
     @staticmethod
-    def parse_diffs_from_message(message: Dict[str, Any]) -> Dict[str, str]:
+    def parse_diffs_from_message(message: Message) -> Dict[str, str]:
         """
         Parses unified diffs from a LLM response message.
         
@@ -107,8 +108,8 @@ SOF```
         Returns:
             A dictionary mapping filenames to their diff content.
         """
-        assert message and 'content' in message, "Invalid message format"
-        content = message['content']
+        assert message and message.content, "Invalid message format"
+        content = message.content
         
         diffs = {}
         

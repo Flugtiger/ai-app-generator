@@ -1,8 +1,9 @@
-from typing import List, Dict, Any
+from typing import List
 from src.model.model_requirement.model_requirement import ModelRequirement
 from src.model.value_objects.domain_model import DomainModel
 from src.model.services.llm_service import LlmService
 from src.model.services.message_parser import MessageParser
+from src.model.value_objects.message import Message
 
 
 class ModelGenerator:
@@ -58,8 +59,8 @@ Follow these guidelines for a clean DDD model:
         
         # Generate the model using the LLM
         messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": "Please generate a clean DDD model based on the requirements."}
+            Message(role="system", content=system_prompt),
+            Message(role="user", content="Please generate a clean DDD model based on the requirements.")
         ]
         
         response = self.llm_service.generate_response(messages)
@@ -120,8 +121,8 @@ Follow these guidelines for a clean DDD model:
         
         # Generate the model modifications using the LLM
         messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": "Please generate the necessary changes to the DDD model based on the requirements."}
+            Message(role="system", content=system_prompt),
+            Message(role="user", content="Please generate the necessary changes to the DDD model based on the requirements.")
         ]
         
         response = self.llm_service.generate_response(messages)
