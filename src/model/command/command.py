@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from uuid import uuid4
+from typing import ClassVar
+import re
 from src.model.command.command_id import CommandId
 
 
@@ -12,13 +13,41 @@ class Command(BaseModel):
     name: str
     description: str
 
+    # Class variable to track the last used number for auto-incrementing IDs
+    _last_id_number: ClassVar[int] = 0
+    _initialized: ClassVar[bool] = False
+
+    @classmethod
+    def initialize_last_id(cls, existing_commands):
+        """
+        Initialize the _last_id_number based on existing commands.
+        This should be called when the repository is initialized.
+        
+        Args:
+            existing_commands: List of existing Command objects
+        """
+        if cls._initialized:
+            return
+            
+        max_id = 0
+        for cmd in existing_commands:
+            # Extract the number part from the ID
+            match = re.match(r'CMD-(\d+)', cmd.id.value)
+            if match:
+                id_num = int(match.group(1))
+                max_id = max(max_id, id_num)
+        
+        cls._last_id_number = max_id
+        cls._initialized = True
+
     def __init__(self, **data):
         """
         Initialize a new Command.
         If no ID is provided, a new one will be generated.
         """
         if 'id' not in data:
-            data['id'] = CommandId(str(uuid4()))
+            Command._last_id_number += 1
+            data['id'] = CommandId(value=f"CMD-{Command._last_id_number}")
         
         super().__init__(**data)
     
