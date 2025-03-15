@@ -6,6 +6,11 @@ from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel, ValidationError
 
+from src.application.command_commands import (
+    CommandCommands,
+    CreateCommandInput,
+    CreateCommandOutput,
+)
 from src.application.model_generator_commands import (
     GenerateModelInput,
     ModelGeneratorCommands,
@@ -13,6 +18,9 @@ from src.application.model_generator_commands import (
 from src.application.model_requirement_commands import (
     CreateModelRequirementInput,
     ModelRequirementCommands,
+)
+from src.infrastructure.repositories.command.command_file_repository import (
+    CommandFileRepository,
 )
 from src.infrastructure.repositories.model_requirement.model_requirement_file_repository import (
     ModelRequirementFileRepository,
@@ -87,6 +95,7 @@ class CommandLineInterface:
         """Initialize the CLI with repositories and application services."""
         # Initialize repositories
         self.model_requirement_repository = ModelRequirementFileRepository()
+        self.command_repository = CommandFileRepository()
         
         # Initialize the last ID based on existing requirements
         existing_requirements = self.model_requirement_repository.get_all()
@@ -95,6 +104,9 @@ class CommandLineInterface:
         # Initialize application services
         self.model_requirement_commands = ModelRequirementCommands(
             self.model_requirement_repository
+        )
+        self.command_commands = CommandCommands(
+            self.command_repository
         )
         
         # Initialize model generator with Langchain LLM service
@@ -121,6 +133,27 @@ class CommandLineInterface:
         )
         subparsers = parser.add_subparsers(dest="command", help="Command to execute")
         
+        
+        # Create command
+        create_cmd_parser = subparsers.add_parser(
+            "create-command", 
+            help="Create a new command"
+        )
+        create_cmd_parser.add_argument(
+            "--input-file", 
+            type=str, 
+            help="Path to JSON file with input data"
+        )
+        create_cmd_parser.add_argument(
+            "--name", 
+            type=str, 
+            help="Name of the command"
+        )
+        create_cmd_parser.add_argument(
+            "--description", 
+            type=str, 
+            help="Description of the command"
+        )
         
         # Create model requirement command
         create_req_parser = subparsers.add_parser(
@@ -178,7 +211,9 @@ class CommandLineInterface:
         
         try:
             # Dispatch to the appropriate command handler
-            if args.command == "create-model-requirement":
+            if args.command == "create-command":
+                return self._handle_create_command(args)
+            elif args.command == "create-model-requirement":
                 return self._handle_create_model_requirement(args)
             elif args.command == "generate-model":
                 return self._handle_generate_model(args)
@@ -195,6 +230,30 @@ class CommandLineInterface:
             print(f"Unexpected error: {str(e)}")
             return 1
     
+    def _handle_create_command(self, args) -> int:
+        """
+        Handle the create-command command.
+        
+        Args:
+            args: Command-line arguments
+            
+        Returns:
+            Exit code (0 for success)
+        """
+        if args.input_file:
+            input_data = load_json_file(args.input_file)
+            input_model = CreateCommandInput(**input_data)
+        elif args.name and args.description:
+            input_model = CreateCommandInput(
+                name=args.name,
+                description=args.description
+            )
+        else:
+            raise CliError("Either --input-file or both --name and --description must be provided")
+        
+        result = self.command_commands.create_command(input_model)
+        print(f"Created command: {result.json(indent=2)}")
+        return 0
     
     def _handle_create_model_requirement(self, args) -> int:
         """
