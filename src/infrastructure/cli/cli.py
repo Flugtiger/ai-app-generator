@@ -141,7 +141,7 @@ class CommandLineInterface:
         gen_model_parser.add_argument(
             "--input-file", 
             type=str, 
-            help="Path to JSON file with input data"
+            help="Path to JSON file with input data (optional, uses all requirements if not provided)"
         )
         gen_model_parser.add_argument(
             "--output-dir", 
@@ -229,9 +229,10 @@ class CommandLineInterface:
             input_data = load_json_file(args.input_file)
             input_model = GenerateModelInput(**input_data)
         else:
-            # If no input file is provided, create a default input model
-            # or raise an error if additional required parameters are missing
-            raise CliError("--input-file must be provided")
+            # If no input file is provided, use all available model requirements
+            all_requirements = self.model_requirement_repository.get_all()
+            requirement_ids = [ModelRequirementId(value=req.id.value) for req in all_requirements]
+            input_model = GenerateModelInput(model_requirement_ids=requirement_ids)
         
         result = self.model_generator_commands.generate_model(input_model)
         
