@@ -17,6 +17,7 @@ from src.application.model_requirement_commands import (
 from src.infrastructure.repositories.model_requirement.model_requirement_file_repository import (
     ModelRequirementFileRepository,
 )
+from src.model.model_requirement.model_requirement import ModelRequirement
 from src.model.model_requirement.model_requirement_id import ModelRequirementId
 from src.infrastructure.llm.langchain_llm_service import LangchainLlmService
 from src.model.services.llm_service import LlmService
