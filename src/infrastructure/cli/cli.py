@@ -87,6 +87,10 @@ class CommandLineInterface:
         # Initialize repositories
         self.model_requirement_repository = ModelRequirementFileRepository()
         
+        # Initialize the last ID based on existing requirements
+        existing_requirements = self.model_requirement_repository.get_all()
+        ModelRequirement.initialize_last_id(existing_requirements)
+        
         # Initialize application services
         self.model_requirement_commands = ModelRequirementCommands(
             self.model_requirement_repository
