@@ -232,7 +232,13 @@ class CommandLineInterface:
         output_dir = args.output_dir
         for file_path, content in result.files.items():
             full_path = Path(output_dir) / file_path
-            save_json_file(str(full_path), content)
+            
+            # Create directory if it doesn't exist
+            full_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Save content as plain text
+            with open(full_path, 'w') as f:
+                f.write(content)
         
         print(f"Generated model files saved to {output_dir}/")
         return 0
