@@ -21,7 +21,7 @@ class ModelRequirement(BaseModel):
         """
         if 'id' not in data:
             ModelRequirement._last_id_number += 1
-            data['id'] = ModelRequirementId(f"MR-{ModelRequirement._last_id_number}")
+            data['id'] = ModelRequirementId(value=f"MR-{ModelRequirement._last_id_number}")
         
         super().__init__(**data)
 
