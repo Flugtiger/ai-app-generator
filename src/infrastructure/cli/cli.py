@@ -225,16 +225,8 @@ class CommandLineInterface:
         Returns:
             Exit code (0 for success)
         """
-        if args.input_file:
-            input_data = load_json_file(args.input_file)
-            input_model = GenerateModelInput(**input_data)
-        else:
-            # If no input file is provided, use all available model requirements
-            all_requirements = self.model_requirement_repository.get_all()
-            requirement_ids = [ModelRequirementId(value=req.id.value) for req in all_requirements]
-            input_model = GenerateModelInput(model_requirement_ids=requirement_ids)
         
-        result = self.model_generator_commands.generate_model(input_model)
+        result = self.model_generator_commands.generate_model(GenerateModelInput())
         
         # Save generated files to output directory
         output_dir = args.output_dir
