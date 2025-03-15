@@ -209,7 +209,7 @@ class CommandLineInterface:
                 requirement_text=args.requirement_text
             )
         else:
-            raise CliError("Either --input-file or both --bounded-context-id and --requirement-text must be provided")
+            raise CliError("Either --input-file or --requirement-text must be provided")
         
         result = self.model_requirement_commands.create_model_requirement(input_model)
         print(f"Created model requirement: {result.json(indent=2)}")
