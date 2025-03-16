@@ -1,10 +1,10 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="ddd-model-generator",
+    name="ai-app-generator",
     version="0.1.0",
-    description="Domain-Driven Design Model Generator",
-    author="Your Name",
+    description="Generates applications from system requirements using DDD principles and onion architecture by implementing an AI (LLM) workflow.",
+    author="Alexander Lehmann",
     author_email="your.email@example.com",
     packages=find_packages(),
     python_requires=">=3.8",
