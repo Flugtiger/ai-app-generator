@@ -59,7 +59,7 @@ class ApplicationServicesGenerator:
 
         # Prepare the commands text
         commands_text = "\n".join([f"{cmd.id.value}: {cmd.name} - {cmd.description}" for cmd in commands])
-        
+
         # Prepare the domain model files text
         domain_model_files = ""
         for path, content in domain_model.files.items():
@@ -70,10 +70,10 @@ class ApplicationServicesGenerator:
         philosophy = self._load_prompt_from_file("application_services_philosophy.txt")
         system_prompt = "\n\n".join([
             roadmap,
-            "The commands:",
-            commands_text,
             "The existing domain model:",
             domain_model_files,
+            "The commands:",
+            commands_text,
             self.message_parser.get_file_template_with_example(),
             philosophy])
 
