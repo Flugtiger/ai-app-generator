@@ -5,7 +5,24 @@ from src.model.value_objects.files_dictionary import FilesDictionary
 class DomainModel(FilesDictionary):
     """
     A specialized FilesDictionary that represents a domain model's source code.
+    All files in a DomainModel must be inside the 'src/model' directory.
     """
+    
+    def add_file(self, path: str, content: str) -> None:
+        """
+        Add a file to the domain model, ensuring it's inside the 'src/model' directory.
+        
+        Args:
+            path: The path of the file relative to the project root.
+            content: The content of the file.
+            
+        Raises:
+            ValueError: If the path is not inside the 'src/model' directory.
+        """
+        if not path.startswith('src/model/'):
+            raise ValueError(f"Domain model files must be inside 'src/model' directory, got: {path}")
+        
+        super().add_file(path, content)
     
     def apply_diff(self, diff_content: str) -> None:
         """
@@ -85,6 +102,12 @@ class DomainModel(FilesDictionary):
         Returns:
             True if the domain model is valid, False otherwise.
         """
-        # This is a simplified implementation. In a real-world scenario,
-        # you would perform more sophisticated validation.
-        return len(self.files) > 0
+        if len(self.files) == 0:
+            return False
+            
+        # Ensure all files are inside the 'src/model' directory
+        for path in self.files.keys():
+            if not path.startswith('src/model/'):
+                return False
+                
+        return True

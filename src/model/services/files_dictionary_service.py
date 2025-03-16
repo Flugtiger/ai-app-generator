@@ -53,13 +53,16 @@ class FilesDictionaryService:
                 # Get relative path from root directory
                 relative_path = file_path.relative_to(root_path)
                 
+                # Convert to forward slashes for consistency across platforms
+                relative_path_str = str(relative_path).replace('\\', '/')
+                
                 try:
                     # Read file content
                     with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
                     
                     # Add to FilesDictionary
-                    files_dict.add_file(str(relative_path), content)
+                    files_dict.add_file(relative_path_str, content)
                 except UnicodeDecodeError:
                     # Skip binary files
                     continue
@@ -91,7 +94,9 @@ class FilesDictionaryService:
         
         # Write each file
         for file_path, content in files_dict.files.items():
-            full_path = root_path / file_path
+            # Convert to OS-specific path
+            os_path = file_path.replace('/', os.sep)
+            full_path = root_path / os_path
             
             # Create parent directories if they don't exist
             if create_dirs:
