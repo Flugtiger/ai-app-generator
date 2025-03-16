@@ -134,8 +134,6 @@ class ModelGenerator:
 
         # Apply the diffs to the model
         for filename, diff_content in diffs.items():
-            # In a real implementation, you would apply the diff to the file content
-            # For now, we'll just call the apply_diff method which is a placeholder
             modified_model.apply_diff(diff_content)
 
         return modified_model

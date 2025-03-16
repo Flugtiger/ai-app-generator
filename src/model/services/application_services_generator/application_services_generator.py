@@ -91,7 +91,7 @@ class ApplicationServicesGenerator:
 
         # Convert to ApplicationServices
         app_services = ApplicationServices()
-        
+
         # Add each file, ensuring they're in the src/application directory
         for path, content in files_dict.files.items():
             # If the path doesn't start with src/application/, modify it
@@ -99,7 +99,7 @@ class ApplicationServicesGenerator:
                 # Extract the filename and add it to src/application/
                 filename = Path(path).name
                 path = f"src/application/{filename}"
-            
+
             app_services.add_file(path, content)
 
         return app_services
@@ -116,7 +116,7 @@ class ApplicationServicesGenerator:
             An ApplicationServices containing the modified application service code.                                                                   
         """
         assert commands, "Commands cannot be empty"
-        assert current_model, "Current model cannot be empty"
+        assert current_services, "Current model cannot be empty"
 
         # Prepare the commands text
         commands_text = "\n".join([f"{cmd.id.value}: {cmd.name} - {cmd.description}" for cmd in commands])
@@ -150,24 +150,11 @@ class ApplicationServicesGenerator:
         diffs = self.message_parser.parse_diffs_from_message(response)
 
         # Create a new application services as a copy of the current one
-        modified_services = ApplicationServices()
-        for path, content in current_services.files.items():
-            modified_services.add_file(path, content)
+        modified_services = current_services.copy()
+        modified_services.apply_diff()
 
         # Apply the diffs to the application services
         for filename, diff_content in diffs.items():
-            # Ensure the filename starts with src/application/
-            if not filename.startswith('src/application/'):
-                filename = f"src/application/{Path(filename).name}"
-            
-            # Create a temporary FilesDictionary to apply the diff
-            temp_dict = FilesDictionary()
-            temp_dict.add_file(filename, current_services.get_file_content(filename) or "")
-            temp_dict.apply_diff(diff_content)
-            
-            # Add the modified file to the application services
-            modified_content = temp_dict.get_file_content(filename)
-            if modified_content:
-                modified_services.add_file(filename, modified_content)
+            modified_services.apply_diff(diff_content)
 
         return modified_services

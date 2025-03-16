@@ -48,21 +48,13 @@ class ApplicationServicesGeneratorCommands:
         """
         # Get all commands
         commands = self.command_repository.get_all()
-        
+
         # Read the existing domain model from disk
         domain_model = DomainModelService.read_from_directory(input_data.project_path)
-        
-        # Read existing application services from disk
-        existing_app_services = ApplicationServicesService.read_from_directory(input_data.project_path)
 
         # Generate the application services
         app_services = self.application_services_generator.generate_application_services(commands, domain_model)
-        
-        # Merge with existing application services if needed
-        if existing_app_services.files:
-            # Use modify instead of generate if there are existing services
-            app_services = self.application_services_generator.modify_application_services(commands, existing_app_services)
-        
+
         # Write the application services to disk
         ApplicationServicesService.write_to_directory(app_services, input_data.project_path)
 
