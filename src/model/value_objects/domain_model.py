@@ -95,19 +95,21 @@ class DomainModel(FilesDictionary):
         
         return '\n'.join(result_lines)
     
-    def validate(self) -> bool:
+    def merge(self, other: 'FilesDictionary') -> None:
         """
-        Validates that the domain model is well-formed.
+        Merges another FilesDictionary into this one, ensuring all files are inside 'src/model'.
+        Files in the other dictionary will overwrite files in this one if they have the same path.
         
-        Returns:
-            True if the domain model is valid, False otherwise.
-        """
-        if len(self.files) == 0:
-            return False
+        Args:
+            other: The FilesDictionary to merge into this one.
             
-        # Ensure all files are inside the 'src/model' directory
-        for path in self.files.keys():
+        Raises:
+            ValueError: If any file in the other dictionary is not inside 'src/model'.
+        """
+        # Check that all files in the other dictionary are inside 'src/model'
+        for path in other.files.keys():
             if not path.startswith('src/model/'):
-                return False
-                
-        return True
+                raise ValueError(f"Cannot merge file outside 'src/model' directory: {path}")
+        
+        # Merge the files
+        super().merge(other)

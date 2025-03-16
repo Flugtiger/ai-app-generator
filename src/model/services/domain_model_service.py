@@ -60,10 +60,6 @@ class DomainModelService:
             project_root: The root directory of the project.
             create_dirs: Whether to create directories if they don't exist.
         """
-        # Validate the domain model
-        if not domain_model.validate():
-            raise ValueError("Cannot write invalid domain model to directory")
-        
         # Write the domain model to the directory
         FilesDictionaryService.write_to_directory(domain_model, project_root, create_dirs)
     
