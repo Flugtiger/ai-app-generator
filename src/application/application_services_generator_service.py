@@ -6,12 +6,12 @@ from src.model.services.application_services_generator.application_services_gene
 
 class GenerateApplicationServicesInput(BaseModel):
     """Input data for generating application services"""
-    pass
+    project_path: str = "generated"
 
 
 class GenerateApplicationServicesOutput(BaseModel):
     """Output data after generating application services"""
-    files: Dict[str, str]
+    files_count: int
 
 
 class ApplicationServicesGeneratorCommands:

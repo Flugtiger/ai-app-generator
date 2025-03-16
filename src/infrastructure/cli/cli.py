@@ -309,22 +309,13 @@ class CommandLineInterface:
         Returns:
             Exit code (0 for success)
         """
+        # Create input with project path
+        input_data = GenerateModelInput(project_path=args.output_dir)
+        
+        # Generate the model and write to disk
+        result = self.model_generator_commands.generate_model(input_data)
 
-        result = self.model_generator_commands.generate_model(GenerateModelInput())
-
-        # Save generated files to output directory
-        output_dir = args.output_dir
-        for file_path, content in result.files.items():
-            full_path = Path(output_dir) / file_path
-
-            # Create directory if it doesn't exist
-            full_path.parent.mkdir(parents=True, exist_ok=True)
-
-            # Save content as plain text
-            with open(full_path, 'w') as f:
-                f.write(content)
-
-        print(f"Generated model files saved to {output_dir}/")
+        print(f"Generated {result.files_count} model files saved to {args.output_dir}/")
         return 0
 
     def _handle_generate_application_services(self, args) -> int:
@@ -337,24 +328,13 @@ class CommandLineInterface:
         Returns:
             Exit code (0 for success)
         """
+        # Create input with project path
+        input_data = GenerateApplicationServicesInput(project_path=args.output_dir)
+        
+        # Generate the application services and write to disk
+        result = self.application_services_generator_commands.generate_application_services(input_data)
 
-        result = self.application_services_generator_commands.generate_application_services(
-            GenerateApplicationServicesInput()
-        )
-
-        # Save generated files to output directory
-        output_dir = args.output_dir
-        for file_path, content in result.files.items():
-            full_path = Path(output_dir) / file_path
-
-            # Create directory if it doesn't exist
-            full_path.parent.mkdir(parents=True, exist_ok=True)
-
-            # Save content as plain text
-            with open(full_path, 'w') as f:
-                f.write(content)
-
-        print(f"Generated application service files saved to {output_dir}/")
+        print(f"Generated {result.files_count} application service files saved to {args.output_dir}/")
         return 0
 
 
