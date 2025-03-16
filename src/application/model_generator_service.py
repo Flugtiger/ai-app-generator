@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Dict, List
 from src.model.model_requirement.model_requirement_repository import ModelRequirementRepository
 from src.model.services.model_generator.model_generator import ModelGenerator
-from src.model.services.files_dictionary_service import FilesDictionaryService
+from src.model.services.domain_model_service import DomainModelService
 
 
 class GenerateModelInput(BaseModel):
@@ -51,8 +51,8 @@ class ModelGeneratorCommands:
         # Generate the domain model
         domain_model = self.model_generator.generate_model(requirements)
         
-        # Write the domain model to disk
-        FilesDictionaryService.write_to_directory(domain_model, input_data.project_path)
+        # Write the domain model to disk using the domain model service
+        DomainModelService.write_to_directory(domain_model, input_data.project_path)
         
         # Return the number of files written
         return GenerateModelOutput(files_count=len(domain_model.files))

@@ -36,6 +36,7 @@ from src.infrastructure.llm.langchain_llm_service import LangchainLlmService
 from src.model.services.llm_service import LlmService
 from src.model.services.model_generator.model_generator import ModelGenerator
 from src.model.services.application_services_generator.application_services_generator import ApplicationServicesGenerator
+from src.model.services.domain_model_service import DomainModelService
 
 
 class CliError(Exception):
