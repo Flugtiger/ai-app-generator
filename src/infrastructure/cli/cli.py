@@ -15,6 +15,10 @@ from src.application.model_generator_service import (
     GenerateModelInput,
     ModelGeneratorCommands,
 )
+from src.application.application_services_generator_service import (
+    GenerateApplicationServicesInput,
+    ApplicationServicesGeneratorCommands,
+)
 from src.application.model_requirement_service import (
     CreateModelRequirementInput,
     ModelRequirementCommands,
@@ -31,6 +35,7 @@ from src.model.model_requirement.model_requirement_id import ModelRequirementId
 from src.infrastructure.llm.langchain_llm_service import LangchainLlmService
 from src.model.services.llm_service import LlmService
 from src.model.services.model_generator import ModelGenerator
+from src.model.services.application_services_generator import ApplicationServicesGenerator
 
 
 class CliError(Exception):
@@ -112,13 +117,19 @@ class CommandLineInterface:
             self.command_repository
         )
         
-        # Initialize model generator with Langchain LLM service
+        # Initialize services with Langchain LLM service
         llm_service = LangchainLlmService()
         model_generator = ModelGenerator(llm_service)
+        application_services_generator = ApplicationServicesGenerator(llm_service)
         
         self.model_generator_commands = ModelGeneratorCommands(
             self.model_requirement_repository,
             model_generator
+        )
+        
+        self.application_services_generator_commands = ApplicationServicesGeneratorCommands(
+            self.command_repository,
+            application_services_generator
         )
         
         # Set up argument parser
@@ -191,6 +202,18 @@ class CommandLineInterface:
             help="Directory to save generated model files"
         )
         
+        # Generate application services command
+        gen_app_services_parser = subparsers.add_parser(
+            "generate-application-services", 
+            help="Generate application services from commands"
+        )
+        gen_app_services_parser.add_argument(
+            "--output-dir", 
+            type=str, 
+            default="generated_application_services", 
+            help="Directory to save generated application service files"
+        )
+        
         return parser
     
     def run(self, args=None) -> int:
@@ -220,6 +243,8 @@ class CommandLineInterface:
                 return self._handle_create_model_requirement(args)
             elif args.command == "generate-model":
                 return self._handle_generate_model(args)
+            elif args.command == "generate-application-services":
+                return self._handle_generate_application_services(args)
             else:
                 print(f"Unknown command: {args.command}")
                 return 1
@@ -308,6 +333,36 @@ class CommandLineInterface:
                 f.write(content)
         
         print(f"Generated model files saved to {output_dir}/")
+        return 0
+    
+    def _handle_generate_application_services(self, args) -> int:
+        """
+        Handle the generate-application-services command.
+        
+        Args:
+            args: Command-line arguments
+            
+        Returns:
+            Exit code (0 for success)
+        """
+        
+        result = self.application_services_generator_commands.generate_application_services(
+            GenerateApplicationServicesInput()
+        )
+        
+        # Save generated files to output directory
+        output_dir = args.output_dir
+        for file_path, content in result.files.items():
+            full_path = Path(output_dir) / file_path
+            
+            # Create directory if it doesn't exist
+            full_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Save content as plain text
+            with open(full_path, 'w') as f:
+                f.write(content)
+        
+        print(f"Generated application service files saved to {output_dir}/")
         return 0
 
 
