@@ -24,22 +24,29 @@ class DomainModelService:
         """
         if ignore_patterns is None:
             ignore_patterns = ['__pycache__', '*.pyc', '.git', '.vscode', '.idea']
-            
-        # Read all files from the directory
-        files_dict = FilesDictionaryService.read_from_directory(project_root, ignore_patterns)
+        
+        # Create the path to the model directory
+        model_dir = Path(project_root) / 'src' / 'model'
+        
+        # Check if the model directory exists
+        if not model_dir.exists() or not model_dir.is_dir():
+            # Return an empty domain model if the directory doesn't exist
+            return DomainModel()
+        
+        # Read only files from the model directory
+        files_dict = FilesDictionaryService.read_from_directory(str(model_dir), ignore_patterns)
         
         # Create a new DomainModel
         domain_model = DomainModel()
         
-        # Add only files inside 'src/model'
+        # Add files to the domain model with corrected paths
         for path, content in files_dict.files.items():
-            if path.startswith('src/model/'):
-                try:
-                    domain_model.add_file(path, content)
-                except ValueError as e:
-                    # This should never happen since we're checking the path,
-                    # but just in case
-                    print(f"Warning: {e}")
+            # Prepend 'src/model/' to the path
+            model_path = f"src/model/{path}"
+            try:
+                domain_model.add_file(model_path, content)
+            except ValueError as e:
+                print(f"Warning: {e}")
         
         return domain_model
     
