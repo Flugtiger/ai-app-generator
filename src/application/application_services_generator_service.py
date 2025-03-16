@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Dict, List
 from src.model.command.command_repository import CommandRepository
 from src.model.services.application_services_generator.application_services_generator import ApplicationServicesGenerator
-from src.model.services.files_dictionary_service import FilesDictionaryService
+from src.model.services.domain_model_service import DomainModelService
 
 
 class GenerateApplicationServicesInput(BaseModel):
@@ -47,12 +47,15 @@ class ApplicationServicesGeneratorCommands:
         """
         # Get all commands
         commands = self.command_repository.get_all()
+        
+        # Read the existing domain model from disk
+        domain_model = DomainModelService.read_from_directory(input_data.project_path)
 
         # Generate the application services
-        domain_model = self.application_services_generator.generate_application_services(commands)
+        app_services_model = self.application_services_generator.generate_application_services(commands, domain_model)
         
-        # Write the domain model to disk
-        FilesDictionaryService.write_to_directory(domain_model, input_data.project_path)
+        # Write the application services model to disk
+        DomainModelService.write_to_directory(app_services_model, input_data.project_path)
 
         # Return the number of files written
-        return GenerateApplicationServicesOutput(files_count=len(domain_model.files))
+        return GenerateApplicationServicesOutput(files_count=len(app_services_model.files))

@@ -44,12 +44,13 @@ class ApplicationServicesGenerator:
             # Return a default message if the file doesn't exist
             return f"Prompt file '{filename}' not found in {current_dir}"
 
-    def generate_application_services(self, commands: List[Command]) -> DomainModel:
+    def generate_application_services(self, commands: List[Command], domain_model: DomainModel) -> DomainModel:
         """                                                                                                                                   
-        Generates application services based on the provided commands.                                                                        
+        Generates application services based on the provided commands and existing domain model.                                                                        
 
         Args:                                                                                                                                 
-            commands: The commands for which to generate application services.                                                                
+            commands: The commands for which to generate application services.
+            domain_model: The existing domain model to reference when generating application services.                                                                
 
         Returns:                                                                                                                              
             A DomainModel containing the generated application service code.                                                                  
@@ -58,6 +59,11 @@ class ApplicationServicesGenerator:
 
         # Prepare the commands text
         commands_text = "\n".join([f"{cmd.id.value}: {cmd.name} - {cmd.description}" for cmd in commands])
+        
+        # Prepare the domain model files text
+        domain_model_files = ""
+        for path, content in domain_model.files.items():
+            domain_model_files += f"\n{path}\nSOF```\n{content}\n```EOF\n"
 
         # Prepare the system prompt
         roadmap = self._load_prompt_from_file("application_services_roadmap.txt")
@@ -66,6 +72,8 @@ class ApplicationServicesGenerator:
             roadmap,
             "The commands:",
             commands_text,
+            "The existing domain model:",
+            domain_model_files,
             self.message_parser.get_file_template_with_example(),
             philosophy])
 
