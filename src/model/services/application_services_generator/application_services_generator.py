@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List
 from src.model.command.command import Command
 from src.model.value_objects.domain_model import DomainModel
+from src.model.value_objects.application_services import ApplicationServices
 from src.model.services.llm_service import LlmService
 from src.model.services.message_parser import MessageParser
 from src.model.value_objects.message import Message
@@ -44,7 +45,7 @@ class ApplicationServicesGenerator:
             # Return a default message if the file doesn't exist
             return f"Prompt file '{filename}' not found in {current_dir}"
 
-    def generate_application_services(self, commands: List[Command], domain_model: DomainModel) -> DomainModel:
+    def generate_application_services(self, commands: List[Command], domain_model: DomainModel) -> ApplicationServices:
         """                                                                                                                                   
         Generates application services based on the provided commands and existing domain model.                                                                        
 
@@ -53,7 +54,7 @@ class ApplicationServicesGenerator:
             domain_model: The existing domain model to reference when generating application services.                                                                
 
         Returns:                                                                                                                              
-            A DomainModel containing the generated application service code.                                                                  
+            An ApplicationServices containing the generated application service code.                                                                  
         """
         assert commands, "Commands cannot be empty"
 
@@ -88,21 +89,31 @@ class ApplicationServicesGenerator:
         # Parse the files from the response
         files_dict = self.message_parser.parse_files_from_message(response)
 
-        # Convert to DomainModel
-        domain_model = DomainModel(files=files_dict.files)
+        # Convert to ApplicationServices
+        app_services = ApplicationServices()
+        
+        # Add each file, ensuring they're in the src/application directory
+        for path, content in files_dict.files.items():
+            # If the path doesn't start with src/application/, modify it
+            if not path.startswith('src/application/'):
+                # Extract the filename and add it to src/application/
+                filename = Path(path).name
+                path = f"src/application/{filename}"
+            
+            app_services.add_file(path, content)
 
-        return domain_model
+        return app_services
 
-    def modify_application_services(self, commands: List[Command], current_model: DomainModel) -> DomainModel:
+    def modify_application_services(self, commands: List[Command], current_services: ApplicationServices) -> ApplicationServices:
         """                                                                                                                                   
         Modifies existing application services based on the provided commands.                                                                
 
         Args:                                                                                                                                 
             commands: The commands for which to modify application services.                                                                  
-            current_model: The current domain model containing application services to modify.                                                
+            current_services: The current application services to modify.                                                
 
         Returns:                                                                                                                              
-            A DomainModel containing the modified application service code.                                                                   
+            An ApplicationServices containing the modified application service code.                                                                   
         """
         assert commands, "Commands cannot be empty"
         assert current_model, "Current model cannot be empty"
@@ -110,9 +121,9 @@ class ApplicationServicesGenerator:
         # Prepare the commands text
         commands_text = "\n".join([f"{cmd.id.value}: {cmd.name} - {cmd.description}" for cmd in commands])
 
-        # Prepare the current model files
+        # Prepare the current application services files
         current_files = ""
-        for path, content in current_model.files.items():
+        for path, content in current_services.files.items():
             current_files += f"\n{path}\nSOF```\n{content}\n```EOF\n"
 
         # Prepare the system prompt
@@ -138,11 +149,25 @@ class ApplicationServicesGenerator:
         # Parse the diffs from the response
         diffs = self.message_parser.parse_diffs_from_message(response)
 
-        # Create a new domain model as a copy of the current one
-        modified_model = DomainModel(files=dict(current_model.files))
+        # Create a new application services as a copy of the current one
+        modified_services = ApplicationServices()
+        for path, content in current_services.files.items():
+            modified_services.add_file(path, content)
 
-        # Apply the diffs to the model
+        # Apply the diffs to the application services
         for filename, diff_content in diffs.items():
-            modified_model.apply_diff(diff_content)
+            # Ensure the filename starts with src/application/
+            if not filename.startswith('src/application/'):
+                filename = f"src/application/{Path(filename).name}"
+            
+            # Create a temporary FilesDictionary to apply the diff
+            temp_dict = FilesDictionary()
+            temp_dict.add_file(filename, current_services.get_file_content(filename) or "")
+            temp_dict.apply_diff(diff_content)
+            
+            # Add the modified file to the application services
+            modified_content = temp_dict.get_file_content(filename)
+            if modified_content:
+                modified_services.add_file(filename, modified_content)
 
-        return modified_model
+        return modified_services
