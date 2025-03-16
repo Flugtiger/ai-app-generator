@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Dict, List
 from src.model.model_requirement.model_requirement_repository import ModelRequirementRepository
-from src.model.services.model_generator import ModelGenerator
+from src.model.services.model_generator.model_generator import ModelGenerator
 
 
 class GenerateModelInput(BaseModel):

@@ -34,8 +34,8 @@ from src.model.model_requirement.model_requirement import ModelRequirement
 from src.model.model_requirement.model_requirement_id import ModelRequirementId
 from src.infrastructure.llm.langchain_llm_service import LangchainLlmService
 from src.model.services.llm_service import LlmService
-from src.model.services.model_generator import ModelGenerator
-from src.model.services.application_services_generator import ApplicationServicesGenerator
+from src.model.services.model_generator.model_generator import ModelGenerator
+from src.model.services.application_services_generator.application_services_generator import ApplicationServicesGenerator
 
 
 class CliError(Exception):
@@ -46,13 +46,13 @@ class CliError(Exception):
 def load_json_file(file_path: str) -> Dict:
     """
     Load and parse a JSON file.
-    
+
     Args:
         file_path: Path to the JSON file
-        
+
     Returns:
         Parsed JSON content as a dictionary
-        
+
     Raises:
         CliError: If the file cannot be read or parsed
     """
@@ -68,47 +68,45 @@ def load_json_file(file_path: str) -> Dict:
 def save_json_file(file_path: str, data: Union[Dict, List, BaseModel]) -> None:
     """
     Save data to a JSON file.
-    
+
     Args:
         file_path: Path to the JSON file
         data: Data to save (dictionary, list, or Pydantic model)
-        
+
     Raises:
         CliError: If the file cannot be written
     """
     try:
         # Create directory if it doesn't exist
         Path(file_path).parent.mkdir(parents=True, exist_ok=True)
-        
+
         # Convert Pydantic model to dict if needed
         if isinstance(data, BaseModel):
             data = data.dict()
-            
+
         with open(file_path, 'w') as f:
             json.dump(data, f, indent=2)
     except Exception as e:
         raise CliError(f"Failed to save file {file_path}: {str(e)}")
 
 
-
-
 class CommandLineInterface:
     """
     Command-line interface for the application.
     """
-    
+
     def __init__(self):
         """Initialize the CLI with repositories and application services."""
         # Initialize repositories
         self.model_requirement_repository = ModelRequirementFileRepository()
         self.command_repository = CommandFileRepository()
-        
+
         # Initialize the last ID based on existing requirements
         existing_requirements = self.model_requirement_repository.get_all()
         ModelRequirement.initialize_last_id(existing_requirements)
         existing_commands = self.command_repository.get_all()
         Command.initialize_last_id(existing_commands)
-        
+
         # Initialize application services
         self.model_requirement_commands = ModelRequirementCommands(
             self.model_requirement_repository
@@ -116,29 +114,29 @@ class CommandLineInterface:
         self.command_commands = CommandCommands(
             self.command_repository
         )
-        
+
         # Initialize services with Langchain LLM service
         llm_service = LangchainLlmService()
         model_generator = ModelGenerator(llm_service)
         application_services_generator = ApplicationServicesGenerator(llm_service)
-        
+
         self.model_generator_commands = ModelGeneratorCommands(
             self.model_requirement_repository,
             model_generator
         )
-        
+
         self.application_services_generator_commands = ApplicationServicesGeneratorCommands(
             self.command_repository,
             application_services_generator
         )
-        
+
         # Set up argument parser
         self.parser = self._create_parser()
-    
+
     def _create_parser(self) -> argparse.ArgumentParser:
         """
         Create the argument parser for the CLI.
-        
+
         Returns:
             Configured argument parser
         """
@@ -146,83 +144,77 @@ class CommandLineInterface:
             description="Domain-Driven Design (DDD) Model Generator CLI"
         )
         subparsers = parser.add_subparsers(dest="command", help="Command to execute")
-        
-        
+
         # Create command
         create_cmd_parser = subparsers.add_parser(
-            "create-command", 
+            "create-command",
             help="Create a new command"
         )
         create_cmd_parser.add_argument(
-            "--input-file", 
-            type=str, 
+            "--input-file",
+            type=str,
             help="Path to JSON file with input data"
         )
         create_cmd_parser.add_argument(
-            "--name", 
-            type=str, 
+            "--name",
+            type=str,
             help="Name of the command"
         )
         create_cmd_parser.add_argument(
-            "--description", 
-            type=str, 
+            "--description",
+            type=str,
             help="Description of the command"
         )
-        
+
         # Create model requirement command
         create_req_parser = subparsers.add_parser(
-            "create-model-requirement", 
+            "create-model-requirement",
             help="Create a new model requirement"
         )
         create_req_parser.add_argument(
-            "--input-file", 
-            type=str, 
+            "--input-file",
+            type=str,
             help="Path to JSON file with input data"
         )
         create_req_parser.add_argument(
-            "--requirement-text", 
-            type=str, 
+            "--requirement-text",
+            type=str,
             help="Text of the requirement"
         )
-        
+
         # Generate model command
         gen_model_parser = subparsers.add_parser(
-            "generate-model", 
+            "generate-model",
             help="Generate a domain model from requirements"
         )
         gen_model_parser.add_argument(
-            "--input-file", 
-            type=str, 
-            help="Path to JSON file with input data (optional, uses all requirements if not provided)"
-        )
-        gen_model_parser.add_argument(
-            "--output-dir", 
-            type=str, 
-            default="generated_models", 
+            "--output-dir",
+            type=str,
+            default="generated",
             help="Directory to save generated model files"
         )
-        
+
         # Generate application services command
         gen_app_services_parser = subparsers.add_parser(
-            "generate-application-services", 
+            "generate-application-services",
             help="Generate application services from commands"
         )
         gen_app_services_parser.add_argument(
-            "--output-dir", 
-            type=str, 
-            default="generated_application_services", 
+            "--output-dir",
+            type=str,
+            default="generated",
             help="Directory to save generated application service files"
         )
-        
+
         return parser
-    
+
     def run(self, args=None) -> int:
         """
         Run the CLI with the given arguments.
-        
+
         Args:
             args: Command-line arguments (defaults to sys.argv[1:])
-            
+
         Returns:
             Exit code (0 for success, non-zero for error)
         """
@@ -230,11 +222,11 @@ class CommandLineInterface:
             args = self.parser.parse_args()
         else:
             args = self.parser.parse_args(args)
-        
+
         if not args.command:
             self.parser.print_help()
             return 1
-        
+
         try:
             # Dispatch to the appropriate command handler
             if args.command == "create-command":
@@ -257,14 +249,14 @@ class CommandLineInterface:
         except Exception as e:
             print(f"Unexpected error: {str(e)}")
             return 1
-    
+
     def _handle_create_command(self, args) -> int:
         """
         Handle the create-command command.
-        
+
         Args:
             args: Command-line arguments
-            
+
         Returns:
             Exit code (0 for success)
         """
@@ -278,18 +270,18 @@ class CommandLineInterface:
             )
         else:
             raise CliError("Either --input-file or both --name and --description must be provided")
-        
+
         result = self.command_commands.create_command(input_model)
         print(f"Created command: {result.json(indent=2)}")
         return 0
-    
+
     def _handle_create_model_requirement(self, args) -> int:
         """
         Handle the create-model-requirement command.
-        
+
         Args:
             args: Command-line arguments
-            
+
         Returns:
             Exit code (0 for success)
         """
@@ -302,66 +294,66 @@ class CommandLineInterface:
             )
         else:
             raise CliError("Either --input-file or --requirement-text must be provided")
-        
+
         result = self.model_requirement_commands.create_model_requirement(input_model)
         print(f"Created model requirement: {result.json(indent=2)}")
         return 0
-    
+
     def _handle_generate_model(self, args) -> int:
         """
         Handle the generate-model command.
-        
+
         Args:
             args: Command-line arguments
-            
+
         Returns:
             Exit code (0 for success)
         """
-        
+
         result = self.model_generator_commands.generate_model(GenerateModelInput())
-        
+
         # Save generated files to output directory
         output_dir = args.output_dir
         for file_path, content in result.files.items():
             full_path = Path(output_dir) / file_path
-            
+
             # Create directory if it doesn't exist
             full_path.parent.mkdir(parents=True, exist_ok=True)
-            
+
             # Save content as plain text
             with open(full_path, 'w') as f:
                 f.write(content)
-        
+
         print(f"Generated model files saved to {output_dir}/")
         return 0
-    
+
     def _handle_generate_application_services(self, args) -> int:
         """
         Handle the generate-application-services command.
-        
+
         Args:
             args: Command-line arguments
-            
+
         Returns:
             Exit code (0 for success)
         """
-        
+
         result = self.application_services_generator_commands.generate_application_services(
             GenerateApplicationServicesInput()
         )
-        
+
         # Save generated files to output directory
         output_dir = args.output_dir
         for file_path, content in result.files.items():
             full_path = Path(output_dir) / file_path
-            
+
             # Create directory if it doesn't exist
             full_path.parent.mkdir(parents=True, exist_ok=True)
-            
+
             # Save content as plain text
             with open(full_path, 'w') as f:
                 f.write(content)
-        
+
         print(f"Generated application service files saved to {output_dir}/")
         return 0
 
