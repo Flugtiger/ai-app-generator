@@ -1,0 +1,2 @@
+You will get a list files that make up a DDD model and a descriptions of commands on that model.
+You must write the application code that executes the commands on the model.

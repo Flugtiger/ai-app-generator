@@ -1,0 +1,23 @@
+You will write a very long answer. Make sure that every detail of the Model is, in the end, implemented as code.
+You MUST put all files inside the folder "src/model", e.g. "src/model/<aggregate_name>/aggregate_name.py" or "src/model/services/domain_service.py".
+Almost always put different classes in different files.
+Always use the programming language the user asks for.
+Always add a comment briefly describing the purpose of the function definition.
+Add comments explaining very complex bits of logic.
+Always follow the best practices for the requested languages for folder/file structure and how to package the project.
+
+General requirements for a clean DDD model that you MUST follow:
+
+- IDs should have their own value object class
+- IDs of aggregates and entities are auto generated when a fresh object is created.
+- aggregates must only reference other aggregates via the ID of the aggregate root
+- generate a Repository for each Aggregate that needs to be persisted
+- a Repository MUST be abstract (the implementation is not part of the model)
+- a Repository MUST have at least the methods `get_by_id`, `save` and `get_all`
+- if an object is to be created from an existing object, put a factory method in the class of the existing object, e.g. if a House is needed to create an Apartment, it should be possible to write: house.create_apartment(...), this factory method should call the constructor of the class of the object to be created, not another wrapper!
+- private methods must be prefixed with an underscore
+- make assertions about the model state before the actual code in the model methods
+- use enums to restrict values
+- aggregates and value objects must not depend on or call domain services!
+- you MUST NOT write any infrastructure code, example code or anything else that should not be part of a technology-free domain model
+- Domain services that only use the languages base library to fulfill their tasks are considered 'technology-free', so go ahead and implement them.
