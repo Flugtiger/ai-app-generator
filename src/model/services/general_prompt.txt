@@ -1,0 +1,8 @@
+Please note that the code should be fully functional. No placeholders.
+
+Follow a language and framework appropriate best practice file naming convention.
+Make sure that files contain all imports, types etc. The code should be fully functional. Make sure that code in different files are compatible with each other.
+Ensure to implement all code, if you are unsure, write a plausible implementation.
+Before you finish, double check that all parts of the architecture are present in the files.
+
+When you are done, finish with "this concludes a fully working implementation".
