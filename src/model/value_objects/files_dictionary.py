@@ -65,3 +65,15 @@ class FilesDictionary(BaseModel):
             other: The FilesDictionary to merge into this one.
         """
         self.files.update(other.files)
+    
+    def copy(self) -> 'FilesDictionary':
+        """
+        Creates a deep copy of this FilesDictionary.
+        
+        Returns:
+            A new FilesDictionary with the same files.
+        """
+        new_dict = FilesDictionary()
+        for path, content in self.files.items():
+            new_dict.add_file(path, content)
+        return new_dict
