@@ -48,12 +48,8 @@ class CommandCommands:
         Returns:
             Output data containing the created command's details
         """
-        # Generate a unique ID for the command
-        command_id = CommandId(value=f"CMD-{str(uuid4())}")
-        
         # Create the command entity
         command = Command(
-            id=command_id,
             name=input_data.name,
             description=input_data.description
         )

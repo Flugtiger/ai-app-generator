@@ -23,7 +23,7 @@ class LangchainLlmService(LlmService):
             raise ValueError("ANTHROPIC_API_KEY environment variable is not set")
         
         self.llm = ChatAnthropic(
-            model="claude-3-7-sonnet-20240229",
+            model="claude-3-7-sonnet-latest",
             anthropic_api_key=api_key,
             temperature=0.0
         )

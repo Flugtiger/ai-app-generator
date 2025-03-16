@@ -6,16 +6,16 @@ from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel, ValidationError
 
-from src.application.command_commands import (
+from src.application.command_service import (
     CommandCommands,
     CreateCommandInput,
     CreateCommandOutput,
 )
-from src.application.model_generator_commands import (
+from src.application.model_generator_service import (
     GenerateModelInput,
     ModelGeneratorCommands,
 )
-from src.application.model_requirement_commands import (
+from src.application.model_requirement_service import (
     CreateModelRequirementInput,
     ModelRequirementCommands,
 )
@@ -25,6 +25,7 @@ from src.infrastructure.repositories.command.command_file_repository import (
 from src.infrastructure.repositories.model_requirement.model_requirement_file_repository import (
     ModelRequirementFileRepository,
 )
+from src.model.command.command import Command
 from src.model.model_requirement.model_requirement import ModelRequirement
 from src.model.model_requirement.model_requirement_id import ModelRequirementId
 from src.infrastructure.llm.langchain_llm_service import LangchainLlmService
@@ -100,6 +101,8 @@ class CommandLineInterface:
         # Initialize the last ID based on existing requirements
         existing_requirements = self.model_requirement_repository.get_all()
         ModelRequirement.initialize_last_id(existing_requirements)
+        existing_commands = self.command_repository.get_all()
+        Command.initialize_last_id(existing_commands)
         
         # Initialize application services
         self.model_requirement_commands = ModelRequirementCommands(

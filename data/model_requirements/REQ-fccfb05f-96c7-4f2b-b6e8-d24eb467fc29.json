@@ -1,9 +1,0 @@
-{
-  "id": {
-    "value": "fccfb05f-96c7-4f2b-b6e8-d24eb467fc29"
-  },
-  "bounded_context_id": {
-    "value": "H9Q8"
-  },
-  "requirement_text": "A User has an ID, a username and a password"
-}
