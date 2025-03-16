@@ -1,4 +1,6 @@
 from typing import List
+import os
+from pathlib import Path
 from src.model.model_requirement.model_requirement import ModelRequirement
 from src.model.value_objects.domain_model import DomainModel
 from src.model.services.llm_service import LlmService
@@ -21,6 +23,26 @@ class ModelGenerator:
         self.llm_service = llm_service
         self.message_parser = MessageParser()
     
+    def _load_prompt_from_file(self, filename: str) -> str:
+        """
+        Load system prompt text from a file in the same directory as this class.
+        
+        Args:
+            filename: The name of the file to load
+            
+        Returns:
+            The content of the file as a string
+        """
+        current_dir = Path(os.path.dirname(os.path.abspath(__file__)))
+        file_path = current_dir / filename
+        
+        try:
+            with open(file_path, 'r') as file:
+                return file.read()
+        except FileNotFoundError:
+            # Return a default message if the file doesn't exist
+            return f"Prompt file '{filename}' not found in {current_dir}"
+    
     def generate_model(self, requirements: List[ModelRequirement]) -> DomainModel:
         """
         Generates a DDD model from scratch based on the provided requirements.
@@ -36,25 +58,16 @@ class ModelGenerator:
         # Prepare the requirements text
         requirements_text = "\n".join([f"{req.id}: {req.requirement_text}" for req in requirements])
         
-        # Prepare the system prompt
+        # Load the system prompt from file and format it with requirements
+        prompt_template = self._load_prompt_from_file("model_generator_prompt.txt")
         system_prompt = f"""
-You are a Domain-Driven Design expert. You will create a clean DDD model based on the following requirements:
+{prompt_template}
+
+The following requirements:
 
 {requirements_text}
 
 {self.message_parser.get_file_template_with_example()}
-
-Follow these guidelines for a clean DDD model:
-- IDs should have their own value object class
-- IDs of aggregates and entities are auto generated when a fresh object is created
-- Aggregates must only reference other aggregates via the ID of the aggregate root
-- Generate a Repository for each Aggregate that needs to be persisted
-- A Repository MUST be abstract (the implementation is not part of the model)
-- A Repository MUST have at least a function `get_by_id` and a function `save`
-- Private methods must be prefixed with an underscore
-- Make assertions about the model state before the actual code in the model methods
-- Use enums to restrict values
-- Aggregates and value objects must not depend on or call domain services
 """
         
         # Generate the model using the LLM
@@ -95,9 +108,12 @@ Follow these guidelines for a clean DDD model:
         for path, content in current_model.files.items():
             current_files += f"\n{path}\nSOF```\n{content}\n```EOF\n"
         
-        # Prepare the system prompt
+        # Load the system prompt from file and format it with requirements and current model
+        prompt_template = self._load_prompt_from_file("model_modifier_prompt.txt")
         system_prompt = f"""
-You are a Domain-Driven Design expert. You will modify an existing DDD model based on the following requirements:
+{prompt_template}
+
+The following requirements:
 
 {requirements_text}
 
@@ -105,18 +121,6 @@ Here is the current model:
 {current_files}
 
 {self.message_parser.get_diff_template_with_example()}
-
-Follow these guidelines for a clean DDD model:
-- IDs should have their own value object class
-- IDs of aggregates and entities are auto generated when a fresh object is created
-- Aggregates must only reference other aggregates via the ID of the aggregate root
-- Generate a Repository for each Aggregate that needs to be persisted
-- A Repository MUST be abstract (the implementation is not part of the model)
-- A Repository MUST have at least a function `get_by_id` and a function `save`
-- Private methods must be prefixed with an underscore
-- Make assertions about the model state before the actual code in the model methods
-- Use enums to restrict values
-- Aggregates and value objects must not depend on or call domain services
 """
         
         # Generate the model modifications using the LLM
