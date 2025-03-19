@@ -1,8 +1,8 @@
-# Domain-Driven Design Model Generator
+# AI Application Generator
 
 ## Project Summary
 
-This project is a tool for automatically generating Domain-Driven Design (DDD) models and application services from requirements and commands. It leverages Large Language Models (LLMs) to interpret natural language requirements and generate clean, well-structured code that follows DDD principles.
+This project is a tool for automatically generating an application with a Domain-Driven Design (DDD) model and application services from requirements and commands. It leverages Large Language Models (LLMs) to interpret natural language requirements and generate clean, well-structured code that follows DDD principles.
 
 ### Key Features
 
@@ -25,8 +25,8 @@ This project is a tool for automatically generating Domain-Driven Design (DDD) m
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ddd-model-generator.git
-cd ddd-model-generator
+git clone git@github.com:Flugtiger/ai-app-generator.git
+cd ai-app-generator
 
 # Install dependencies
 pip install -e .
@@ -44,7 +44,7 @@ Example requirement JSON:
 
 ```json
 {
-  "text": "The system needs to manage customers. Each customer has a name, email, and address. Customers can place orders."
+  "requirement_text": "The system needs to manage customers. Each customer has a name, email, and address. Customers can place orders."
 }
 ```
 
@@ -70,17 +70,17 @@ Example command JSON:
 Generate a domain model from all requirements:
 
 ```bash
-python -m src.infrastructure.cli.cli generate-model --output-dir generated
+python -m src.infrastructure.cli.cli generate-model
 ```
 
-This will create all the necessary domain model files in the specified output directory.
+This will create all the necessary domain model files.
 
 ### Generating Application Services
 
 Generate application services based on commands and the domain model:
 
 ```bash
-python -m src.infrastructure.cli.cli generate-application-services --output-dir generated
+python -m src.infrastructure.cli.cli generate-application-services
 ```
 
 This will create application service files that implement the commands using the domain model.
@@ -95,18 +95,21 @@ This will create application service files that implement the commands using the
 ### Development Setup
 
 1. Clone the repository:
+
    ```bash
-   git clone https://github.com/yourusername/ddd-model-generator.git
-   cd ddd-model-generator
+   git clone git@github.com:Flugtiger/ai-app-generator.git
+   cd ai-app-generator
    ```
 
 2. Create a virtual environment:
+
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
 3. Install in development mode:
+
    ```bash
    pip install -e .
    ```
