@@ -23,6 +23,10 @@ from src.application.model_requirement_service import (
     CreateModelRequirementInput,
     ModelRequirementCommands,
 )
+from src.application.infra_requirement_service import (
+    CreateInfraRequirementInput,
+    InfraRequirementCommands,
+)
 from src.infrastructure.repositories.command.command_file_repository import (
     CommandFileRepository,
 )
@@ -32,6 +36,10 @@ from src.infrastructure.repositories.model_requirement.model_requirement_file_re
 from src.model.command.command import Command
 from src.model.model_requirement.model_requirement import ModelRequirement
 from src.model.model_requirement.model_requirement_id import ModelRequirementId
+from src.model.infra_requirement.infra_requirement import InfraRequirement
+from src.infrastructure.repositories.infra_requirement.infra_requirement_file_repository import (
+    InfraRequirementFileRepository,
+)
 from src.infrastructure.llm.langchain_llm_service import LangchainLlmService
 from src.model.services.llm_service import LlmService
 from src.model.services.model_generator.model_generator import ModelGenerator
@@ -102,12 +110,15 @@ class CommandLineInterface:
         # Initialize repositories
         self.model_requirement_repository = ModelRequirementFileRepository()
         self.command_repository = CommandFileRepository()
+        self.infra_requirement_repository = InfraRequirementFileRepository()
 
         # Initialize the last ID based on existing requirements
         existing_requirements = self.model_requirement_repository.get_all()
         ModelRequirement.initialize_last_id(existing_requirements)
         existing_commands = self.command_repository.get_all()
         Command.initialize_last_id(existing_commands)
+        existing_infra_requirements = self.infra_requirement_repository.get_all()
+        InfraRequirement.initialize_last_id(existing_infra_requirements)
 
         # Initialize application services
         self.model_requirement_commands = ModelRequirementCommands(
@@ -115,6 +126,9 @@ class CommandLineInterface:
         )
         self.command_commands = CommandCommands(
             self.command_repository
+        )
+        self.infra_requirement_commands = InfraRequirementCommands(
+            self.infra_requirement_repository
         )
 
         # Initialize services with Langchain LLM service
@@ -184,6 +198,22 @@ class CommandLineInterface:
             help="Text of the requirement"
         )
 
+        # Create infrastructure requirement command
+        create_infra_req_parser = subparsers.add_parser(
+            "create-infra-requirement",
+            help="Create a new infrastructure requirement"
+        )
+        create_infra_req_parser.add_argument(
+            "--input-file",
+            type=str,
+            help="Path to JSON file with input data"
+        )
+        create_infra_req_parser.add_argument(
+            "--requirement-text",
+            type=str,
+            help="Text of the requirement"
+        )
+
         # Generate model command
         gen_model_parser = subparsers.add_parser(
             "generate-model",
@@ -235,6 +265,8 @@ class CommandLineInterface:
                 return self._handle_create_command(args)
             elif args.command == "create-model-requirement":
                 return self._handle_create_model_requirement(args)
+            elif args.command == "create-infra-requirement":
+                return self._handle_create_infra_requirement(args)
             elif args.command == "generate-model":
                 return self._handle_generate_model(args)
             elif args.command == "generate-application-services":
@@ -318,6 +350,30 @@ class CommandLineInterface:
         result = self.model_generator_commands.generate_model(input_data)
 
         print(f"Generated {result.files_count} model files saved to {args.output_dir}/")
+        return 0
+
+    def _handle_create_infra_requirement(self, args) -> int:
+        """
+        Handle the create-infra-requirement command.
+
+        Args:
+            args: Command-line arguments
+
+        Returns:
+            Exit code (0 for success)
+        """
+        if args.input_file:
+            input_data = load_json_file(args.input_file)
+            input_model = CreateInfraRequirementInput(**input_data)
+        elif args.requirement_text:
+            input_model = CreateInfraRequirementInput(
+                requirement_text=args.requirement_text
+            )
+        else:
+            raise CliError("Either --input-file or --requirement-text must be provided")
+
+        result = self.infra_requirement_commands.create_infra_requirement(input_model)
+        print(f"Created infrastructure requirement: {result.json(indent=2)}")
         return 0
 
     def _handle_generate_application_services(self, args) -> int:

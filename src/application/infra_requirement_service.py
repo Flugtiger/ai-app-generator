@@ -18,6 +18,7 @@ class CreateInfraRequirementOutput(BaseModel):
     Output data after creating a new infrastructure requirement.
     """
     id: str
+    requirement_text: str
 
 
 class InfraRequirementCommands:
@@ -55,4 +56,5 @@ class InfraRequirementCommands:
         # Return the output
         return CreateInfraRequirementOutput(
             id=infra_requirement.id.value,
+            requirement_text=infra_requirement.requirement_text
         )
