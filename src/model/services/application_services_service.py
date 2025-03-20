@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import List, Optional
 
-from src.model.value_objects.application_services import ApplicationFiles
+from src.model.value_objects.application_files import ApplicationFiles
 from src.model.services.files_dictionary_service import FilesDictionaryService
 
 

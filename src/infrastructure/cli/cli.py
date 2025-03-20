@@ -306,7 +306,7 @@ class CommandLineInterface:
             raise CliError("Either --input-file or both --name and --description must be provided")
 
         result = self.command_commands.create_command(input_model)
-        print(f"Created command: {result.json(indent=2)}")
+        print(f"Created command: {result.model_dump_json(indent=2)}")
         return 0
 
     def _handle_create_model_requirement(self, args) -> int:
@@ -330,7 +330,7 @@ class CommandLineInterface:
             raise CliError("Either --input-file or --requirement-text must be provided")
 
         result = self.model_requirement_commands.create_model_requirement(input_model)
-        print(f"Created model requirement: {result.json(indent=2)}")
+        print(f"Created model requirement: {result.model_dump_json(indent=2)}")
         return 0
 
     def _handle_generate_model(self, args) -> int:
@@ -345,7 +345,7 @@ class CommandLineInterface:
         """
         # Create input with project path
         input_data = GenerateModelInput(project_path=args.output_dir)
-        
+
         # Generate the model and write to disk
         result = self.model_generator_commands.generate_model(input_data)
 
@@ -373,7 +373,7 @@ class CommandLineInterface:
             raise CliError("Either --input-file or --requirement-text must be provided")
 
         result = self.infra_requirement_commands.create_infra_requirement(input_model)
-        print(f"Created infrastructure requirement: {result.json(indent=2)}")
+        print(f"Created infrastructure requirement: {result.model_dump_json(indent=2)}")
         return 0
 
     def _handle_generate_application_services(self, args) -> int:
@@ -388,7 +388,7 @@ class CommandLineInterface:
         """
         # Create input with project path
         input_data = GenerateApplicationServicesInput(project_path=args.output_dir)
-        
+
         # Generate the application services and write to disk
         result = self.application_services_generator_commands.generate_application_services(input_data)
 
