@@ -2,7 +2,7 @@ from typing import List
 import os
 from pathlib import Path
 from src.model.model_requirement.model_requirement import ModelRequirement
-from src.model.value_objects.domain_model import DomainModel
+from src.model.value_objects.domain_model_files import DomainModelFiles
 from src.model.services.llm_service import LlmService
 from src.model.services.message_parser import MessageParser
 from src.model.value_objects.message import Message
@@ -43,7 +43,7 @@ class ModelGenerator:
             # Return a default message if the file doesn't exist
             return f"Prompt file '{filename}' not found in {current_dir}"
 
-    def generate_model(self, requirements: List[ModelRequirement]) -> DomainModel:
+    def generate_model(self, requirements: List[ModelRequirement]) -> DomainModelFiles:
         """
         Generates a DDD model from scratch based on the provided requirements.
 
@@ -80,11 +80,11 @@ class ModelGenerator:
         files_dict = self.message_parser.parse_files_from_message(response)
 
         # Convert to DomainModel
-        domain_model = DomainModel(files=files_dict.files)
+        domain_model = DomainModelFiles(files=files_dict.files)
 
         return domain_model
 
-    def modify_model(self, requirements: List[ModelRequirement], current_model: DomainModel) -> DomainModel:
+    def modify_model(self, requirements: List[ModelRequirement], current_model: DomainModelFiles) -> DomainModelFiles:
         """
         Modifies an existing DDD model based on the provided requirements.
 
@@ -130,7 +130,7 @@ class ModelGenerator:
         diffs = self.message_parser.parse_diffs_from_message(response)
 
         # Create a new domain model as a copy of the current one
-        modified_model = DomainModel(files=dict(current_model.files))
+        modified_model = DomainModelFiles(files=dict(current_model.files))
 
         # Apply the diffs to the model
         for filename, diff_content in diffs.items():

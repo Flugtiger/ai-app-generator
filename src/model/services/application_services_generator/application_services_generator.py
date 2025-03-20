@@ -2,8 +2,8 @@ import os
 from pathlib import Path
 from typing import List
 from src.model.command.command import Command
-from src.model.value_objects.domain_model import DomainModel
-from src.model.value_objects.application_services import ApplicationServices
+from src.model.value_objects.domain_model_files import DomainModelFiles
+from src.model.value_objects.application_files import ApplicationFiles
 from src.model.services.llm_service import LlmService
 from src.model.services.message_parser import MessageParser
 from src.model.value_objects.message import Message
@@ -45,7 +45,7 @@ class ApplicationServicesGenerator:
             # Return a default message if the file doesn't exist
             return f"Prompt file '{filename}' not found in {current_dir}"
 
-    def generate_application_services(self, commands: List[Command], domain_model: DomainModel) -> ApplicationServices:
+    def generate_application_services(self, commands: List[Command], domain_model: DomainModelFiles) -> ApplicationFiles:
         """                                                                                                                                   
         Generates application services based on the provided commands and existing domain model.                                                                        
 
@@ -90,7 +90,7 @@ class ApplicationServicesGenerator:
         files_dict = self.message_parser.parse_files_from_message(response)
 
         # Convert to ApplicationServices
-        app_services = ApplicationServices()
+        app_services = ApplicationFiles()
 
         # Add each file, ensuring they're in the src/application directory
         for path, content in files_dict.files.items():
@@ -104,7 +104,7 @@ class ApplicationServicesGenerator:
 
         return app_services
 
-    def modify_application_services(self, commands: List[Command], current_services: ApplicationServices) -> ApplicationServices:
+    def modify_application_services(self, commands: List[Command], current_services: ApplicationFiles) -> ApplicationFiles:
         """                                                                                                                                   
         Modifies existing application services based on the provided commands.                                                                
 

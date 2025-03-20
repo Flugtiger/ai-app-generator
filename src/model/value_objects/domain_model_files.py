@@ -2,7 +2,7 @@ import re
 from src.model.value_objects.files_dictionary import FilesDictionary
 
 
-class DomainModel(FilesDictionary):
+class DomainModelFiles(FilesDictionary):
     """
     A specialized FilesDictionary that represents a domain model's source code.
     All files in a DomainModel must be inside the 'src/model' directory.
