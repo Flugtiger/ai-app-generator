@@ -27,6 +27,10 @@ from src.application.infra_requirement_service import (
     CreateInfraRequirementInput,
     InfraRequirementCommands,
 )
+from src.application.infrastructure_generator_service import (
+    GenerateInfrastructureInput,
+    InfrastructureGeneratorCommands,
+)
 from src.infrastructure.repositories.command.command_file_repository import (
     CommandFileRepository,
 )
@@ -44,6 +48,7 @@ from src.infrastructure.llm.langchain_llm_service import LangchainLlmService
 from src.model.services.llm_service import LlmService
 from src.model.services.model_generator.model_generator import ModelGenerator
 from src.model.services.application_services_generator.application_services_generator import ApplicationServicesGenerator
+from src.model.services.infrastructure_generator.infrastructure_generator import InfrastructureGenerator
 from src.model.services.domain_model_service import DomainModelService
 from src.model.services.application_services_service import ApplicationServicesService
 
@@ -135,6 +140,7 @@ class CommandLineInterface:
         llm_service = LangchainLlmService()
         model_generator = ModelGenerator(llm_service)
         application_services_generator = ApplicationServicesGenerator(llm_service)
+        infrastructure_generator = InfrastructureGenerator(llm_service)
 
         self.model_generator_commands = ModelGeneratorCommands(
             self.model_requirement_repository,
@@ -144,6 +150,11 @@ class CommandLineInterface:
         self.application_services_generator_commands = ApplicationServicesGeneratorCommands(
             self.command_repository,
             application_services_generator
+        )
+        
+        self.infrastructure_generator_commands = InfrastructureGeneratorCommands(
+            self.infra_requirement_repository,
+            infrastructure_generator
         )
 
         # Set up argument parser
@@ -238,6 +249,24 @@ class CommandLineInterface:
             help="Directory to save generated application service files"
         )
 
+        # Generate infrastructure command
+        gen_infra_parser = subparsers.add_parser(
+            "generate-infrastructure",
+            help="Generate infrastructure code from requirements"
+        )
+        gen_infra_parser.add_argument(
+            "--output-dir",
+            type=str,
+            default="generated",
+            help="Directory to save generated infrastructure files"
+        )
+        gen_infra_parser.add_argument(
+            "--requirement-ids",
+            type=str,
+            nargs="+",
+            help="IDs of infrastructure requirements to use (optional, uses all if not specified)"
+        )
+
         return parser
 
     def run(self, args=None) -> int:
@@ -271,6 +300,8 @@ class CommandLineInterface:
                 return self._handle_generate_model(args)
             elif args.command == "generate-application-services":
                 return self._handle_generate_application_services(args)
+            elif args.command == "generate-infrastructure":
+                return self._handle_generate_infrastructure(args)
             else:
                 print(f"Unknown command: {args.command}")
                 return 1
@@ -388,11 +419,33 @@ class CommandLineInterface:
         """
         # Create input with project path
         input_data = GenerateApplicationServicesInput(project_path=args.output_dir)
-
+        
         # Generate the application services and write to disk
         result = self.application_services_generator_commands.generate_application_services(input_data)
 
         print(f"Generated {result.files_count} application service files saved to {args.output_dir}/")
+        return 0
+        
+    def _handle_generate_infrastructure(self, args) -> int:
+        """
+        Handle the generate-infrastructure command.
+
+        Args:
+            args: Command-line arguments
+
+        Returns:
+            Exit code (0 for success)
+        """
+        # Create input with project path and optional requirement IDs
+        input_data = GenerateInfrastructureInput(
+            project_path=args.output_dir,
+            requirement_ids=args.requirement_ids
+        )
+        
+        # Generate the infrastructure code and write to disk
+        result = self.infrastructure_generator_commands.generate_infrastructure(input_data)
+
+        print(f"Generated {result.files_count} infrastructure files saved to {args.output_dir}/")
         return 0
 
 
