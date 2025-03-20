@@ -9,11 +9,7 @@
       "type": "debugpy",
       "request": "launch",
       "module": "src.infrastructure.cli",
-      "args": [
-        "create-model-requirement",
-        "--requirement-text",
-        "This is a test"
-      ]
+      "args": ["generate-infrastructure"]
     }
   ]
 }
