@@ -102,12 +102,19 @@ class FileBasedRepository(Generic[T, ID], ABC):
         """
         entities = []
         
+        # Create the directory if it doesn't exist
+        os.makedirs(self.base_dir, exist_ok=True)
+        
         for file_path in self.base_dir.glob("*.json"):
-            with open(file_path, 'r') as f:
-                data = json.load(f)
-            
-            entity = self.get_entity_type().parse_obj(data)
-            entities.append(entity)
+            try:
+                with open(file_path, 'r') as f:
+                    data = json.load(f)
+                
+                entity = self.get_entity_type().parse_obj(data)
+                entities.append(entity)
+            except (json.JSONDecodeError, FileNotFoundError):
+                # Skip files that can't be parsed
+                continue
         
         return entities
     

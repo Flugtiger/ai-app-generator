@@ -94,7 +94,7 @@ class InfrastructureGenerator:
         # Convert to InfrastructureFiles
         infra_files = InfrastructureFiles()
 
-        # Add each file, ensuring they're in the src/application directory
+        # Add each file, ensuring they're in the src/infrastructure directory
         for path, content in files_dict.files.items():
             infra_files.add_file(path, content)
 
