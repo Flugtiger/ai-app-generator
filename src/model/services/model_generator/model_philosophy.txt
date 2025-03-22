@@ -9,10 +9,11 @@ Always follow the best practices for the requested languages for folder/file str
 General requirements for a clean DDD model that you MUST follow:
 
 - use pydantics `BaseModel` as the base for all classes that need to be serialized (e.g. aggregates)
+- use pydantic V2 syntax
 - IDs should have their own value object class
 - IDs of aggregates and entities are auto generated when a fresh object is created.
 - aggregates must only reference other aggregates via the ID of the aggregate root
-- generate a Repository for each Aggregate that needs to be persisted
+- generate a Repository for each Aggregate
 - a Repository MUST be abstract (the implementation is not part of the model)
 - a Repository MUST have at least the methods `get_by_id`, `save` and `get_all`
 - if an object is to be created from an existing object, put a factory method in the class of the existing object, e.g. if a House is needed to create an Apartment, it should be possible to write: house.create_apartment(...), this factory method should call the constructor of the class of the object to be created, not another wrapper!

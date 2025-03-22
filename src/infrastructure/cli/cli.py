@@ -398,7 +398,7 @@ class CommandLineInterface:
             input_model = CreateInfraRequirementInput(**input_data)
         elif args.requirement_text:
             input_model = CreateInfraRequirementInput(
-                requirement_text=args.requirement_text
+                requirementText=args.requirement_text
             )
         else:
             raise CliError("Either --input-file or --requirement-text must be provided")

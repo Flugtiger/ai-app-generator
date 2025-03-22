@@ -10,7 +10,7 @@ class CreateInfraRequirementInput(BaseModel):
     """
     Input data for creating a new infrastructure requirement.
     """
-    requirement_text: str
+    requirementText: str
 
 
 class CreateInfraRequirementOutput(BaseModel):
@@ -46,7 +46,7 @@ class InfraRequirementCommands:
         """
         # Create a new infrastructure requirement
         infra_requirement = InfraRequirement(
-            requirement_text=input_data.requirement_text
+            requirement_text=input_data.requirementText
         )
 
         # Save the infrastructure requirement

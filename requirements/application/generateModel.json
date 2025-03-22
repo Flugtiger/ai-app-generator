@@ -1,5 +1,4 @@
 {
-  "type": "command",
   "name": "generateModel",
-  "requirementText": "As a User I can generate a domain model from all the model requirements."
+  "description": "As a User I can generate a domain model from all the model requirements. The model files are written into the target directory (default: 'generated'). The command returns the number of generated files."
 }

@@ -7,6 +7,10 @@ from src.model.services.llm_service import LlmService
 from src.model.services.message_parser import MessageParser
 from src.model.value_objects.message import Message
 
+from logging import getLogger
+
+logger = getLogger(__name__)
+
 
 class ModelGenerator:
     """
@@ -75,6 +79,7 @@ class ModelGenerator:
         ]
 
         response = self.llm_service.generate_response(messages)
+        logger.info("LLM response:\n%s", response.model_dump_json(indent=2))
 
         # Parse the files from the response
         files_dict = self.message_parser.parse_files_from_message(response)

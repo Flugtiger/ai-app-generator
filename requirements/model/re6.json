@@ -1,3 +1,0 @@
-{
-  "requirementText": "The Message Parser domain service can be used to parse file contents from LLM responses. To do so, it defines a template for how a LLM should output files. The Message Parser provides the template together with an example for use in system prompts. It has a method for parsing a LLM response message that returns a File Dictionary with the parsed files."
-}

@@ -1,0 +1,4 @@
+{
+  "name": "generateApplication",
+  "description": "As a User I can generate the application layer from all the commands. The application layer files are written to the target directory (default: 'generated'). The command returns the number of generated files."
+}

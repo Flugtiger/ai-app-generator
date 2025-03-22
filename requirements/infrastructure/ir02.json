@@ -1,0 +1,3 @@
+{
+  "requirementText": "Use Langchain to implement the LLM Service. The implementation should be hard coded to Anthropic Claude for the moment. Expect the Anthropic API key in the environment variable `ANTHROPIC_API_KEY`. Set the max tokens to 10000. Stream the output of the LLM to stdout."
+}

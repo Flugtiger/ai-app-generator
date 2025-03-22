@@ -12,8 +12,9 @@ General requirements for application code:
 - you can put multiple application command functions inside one class, if it makes sense to cluster them together
 - the inputs of a command should be modeled as a data transfer object (DTO), the name of the DTO class must be suffixed with 'Input'
 - the outputs of a command should also be modeled with a DTO, the suffix must be 'Output'
-- NEVER include input data in the output DTOs if not explicitly specified
-- skip generating empty DTOs completely
+- DTOs MUST use pydantic for serialization, attribute names MUST be camel-case to match the JSON representation
+- you MUST NOT include input data in the output DTOs if not explicitly specified
+- you MUST NOT generate empty DTOs
 - the names of the application code function and its DTOs should match to that extend, that it's clear they belong together
 - only write the code that directly interacts with the model (and the mentioned DTOs), don't generate any additional services, examples, main scripts!
 - the application code must be ignorant of any infrastructure and only interact with the model (aggregates, repositories, domain services, ...)

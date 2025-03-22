@@ -1,0 +1,3 @@
+{
+  "requirementText": "The `DomainModelFilesService` can read and write `DomainModelFiles` given a project's root path. It only reads and writes files from/to the subfolder 'src/model'."
+}

@@ -1,0 +1,4 @@
+{
+  "name": "createCommand",
+  "description": "As a User I can create a command. A command has a name and a description and it will be used to generate the application layer for the DDD model of the software."
+}

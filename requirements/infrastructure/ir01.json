@@ -1,0 +1,3 @@
+{
+  "requirementText": "Implement a generic FileRepository class that reads and writes model aggregates from/to json files. Use pydantic V2 APIs to serialize the model classes. Have all repositories use the generic FileRepository but with individual folders for their json files. The common base folder should be 'data'."
+}
