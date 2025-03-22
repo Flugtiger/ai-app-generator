@@ -151,7 +151,7 @@ class CommandLineInterface:
             self.command_repository,
             application_services_generator
         )
-        
+
         self.infrastructure_generator_commands = InfrastructureGeneratorCommands(
             self.infra_requirement_repository,
             infrastructure_generator
@@ -355,7 +355,7 @@ class CommandLineInterface:
             input_model = CreateModelRequirementInput(**input_data)
         elif args.requirement_text:
             input_model = CreateModelRequirementInput(
-                requirement_text=args.requirement_text
+                requirementText=args.requirement_text
             )
         else:
             raise CliError("Either --input-file or --requirement-text must be provided")
@@ -419,13 +419,13 @@ class CommandLineInterface:
         """
         # Create input with project path
         input_data = GenerateApplicationServicesInput(project_path=args.output_dir)
-        
+
         # Generate the application services and write to disk
         result = self.application_services_generator_commands.generate_application_services(input_data)
 
         print(f"Generated {result.files_count} application service files saved to {args.output_dir}/")
         return 0
-        
+
     def _handle_generate_infrastructure(self, args) -> int:
         """
         Handle the generate-infrastructure command.
@@ -441,7 +441,7 @@ class CommandLineInterface:
             project_path=args.output_dir,
             requirement_ids=args.requirement_ids
         )
-        
+
         # Generate the infrastructure code and write to disk
         result = self.infrastructure_generator_commands.generate_infrastructure(input_data)
 

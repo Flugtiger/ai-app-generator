@@ -1,4 +1,3 @@
 {
-  "aggregateRoot": "ModelRequirement",
-  "requirementText": "As a User, I want to define requirements for a DDD model. These requirements reference the Bounded Context they are defined within. A model requirement contains arbitrary text that describes the requirement (attribute: requirementText)."
+  "requirementText": "A Command is a specific type of interaction in the software System. It has a name and a description. The name and description can be modified after the Command has been created."
 }

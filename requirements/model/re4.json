@@ -1,4 +1,3 @@
 {
-  "aggregateRoot": "",
-  "requirementText": "A Files Dictionary is a value object which contains the repository-relative paths of source code files mapped to their content."
+  "requirementText": "A `DomainModelFiles` object is a special type of `FilesDictionary` that constraints all contained files to have a path prefixed by 'src/model'."
 }
