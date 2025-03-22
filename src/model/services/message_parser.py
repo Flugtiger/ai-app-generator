@@ -74,6 +74,7 @@ SOF```
     def parse_files_from_message(message: Message) -> FilesDictionary:
         """
         Parses file contents from a LLM response message.
+        Handles nested code blocks by counting SOF and EOF markers.
         
         Args:
             message: The LLM response message.
@@ -85,15 +86,35 @@ SOF```
         content = message.content
         
         files_dict = FilesDictionary()
+        lines = content.split('\n')
         
-        # Regular expression to match file blocks
-        pattern = r'([^\n]+)\nSOF```\n(.*?)\n```EOF'
-        matches = re.finditer(pattern, content, re.DOTALL)
-        
-        for match in matches:
-            filename = match.group(1).strip()
-            file_content = match.group(2)
-            files_dict.add_file(filename, file_content)
+        i = 0
+        while i < len(lines):
+            line = lines[i].strip()
+            
+            # Look for a filename line followed by SOF marker
+            if i + 1 < len(lines) and 'SOF```' in lines[i + 1]:
+                filename = line
+                i += 2  # Skip the SOF marker
+                
+                # Collect content until matching EOF marker
+                file_content = []
+                sof_count = 1  # We've already seen one SOF
+                
+                while i < len(lines):
+                    if 'SOF```' in lines[i]:
+                        sof_count += 1
+                    elif '```EOF' in lines[i]:
+                        sof_count -= 1
+                        if sof_count == 0:  # Found matching EOF
+                            break
+                    file_content.append(lines[i])
+                    i += 1
+                
+                if sof_count == 0:  # Successfully found matching EOF
+                    files_dict.add_file(filename, '\n'.join(file_content))
+            
+            i += 1
         
         return files_dict
     
@@ -101,6 +122,7 @@ SOF```
     def parse_diffs_from_message(message: Message) -> Dict[str, str]:
         """
         Parses unified diffs from a LLM response message.
+        Handles nested code blocks by counting SOF and EOF markers.
         
         Args:
             message: The LLM response message.
@@ -112,14 +134,34 @@ SOF```
         content = message.content
         
         diffs = {}
+        lines = content.split('\n')
         
-        # Regular expression to match diff blocks
-        pattern = r'([^\n]+)\nSOF```\n(.*?)\n```EOF'
-        matches = re.finditer(pattern, content, re.DOTALL)
-        
-        for match in matches:
-            filename = match.group(1).strip()
-            diff_content = match.group(2)
-            diffs[filename] = diff_content
+        i = 0
+        while i < len(lines):
+            line = lines[i].strip()
+            
+            # Look for a filename line followed by SOF marker
+            if i + 1 < len(lines) and 'SOF```' in lines[i + 1]:
+                filename = line
+                i += 2  # Skip the SOF marker
+                
+                # Collect content until matching EOF marker
+                diff_content = []
+                sof_count = 1  # We've already seen one SOF
+                
+                while i < len(lines):
+                    if 'SOF```' in lines[i]:
+                        sof_count += 1
+                    elif '```EOF' in lines[i]:
+                        sof_count -= 1
+                        if sof_count == 0:  # Found matching EOF
+                            break
+                    diff_content.append(lines[i])
+                    i += 1
+                
+                if sof_count == 0:  # Successfully found matching EOF
+                    diffs[filename] = '\n'.join(diff_content)
+            
+            i += 1
         
         return diffs
