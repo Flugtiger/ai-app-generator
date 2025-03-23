@@ -1,7 +1,5 @@
-import os
-from typing import List, Tuple, Optional
-import tree_sitter
-from tree_sitter import Language, Parser
+from typing import List, Optional
+from tree_sitter import Parser, Language
 
 from src.model.services.code_compression_service import CodeCompressionService
 from src.model.value_objects.files_dictionary import FilesDictionary
@@ -24,30 +22,19 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
     def _setup_parser(self):
         """
         Set up the tree-sitter parser for Python.
+        Assumes tree-sitter-languages is installed via pip.
         """
-        # Path to the compiled language library
-        lib_path = os.path.join(os.path.dirname(__file__), "tree-sitter-languages.so")
-        
-        # Check if the language library exists
-        if not os.path.exists(lib_path):
-            raise RuntimeError(
-                "Tree-sitter language library not found. "
-                "Please run the build script to compile the language library."
+        try:
+            # Import the Python language from tree-sitter-languages
+            from tree_sitter_languages import get_language, get_parser
+            
+            # Get the Python parser
+            self.parser = get_parser('python')
+        except ImportError:
+            raise ImportError(
+                "tree-sitter-languages package not found. "
+                "Please install it with: pip install tree-sitter-languages"
             )
-        
-        # Load the Python language
-        Language.build_library(
-            lib_path,
-            [
-                os.path.join(os.path.dirname(__file__), "tree-sitter-python")
-            ]
-        )
-        
-        PY_LANGUAGE = Language(lib_path, "python")
-        
-        # Create a parser
-        self.parser = Parser()
-        self.parser.set_language(PY_LANGUAGE)
 
     def compress_to_constructor_signatures(self, files: FilesDictionary) -> FilesDictionary:
         """
