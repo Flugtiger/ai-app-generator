@@ -4,7 +4,7 @@ from typing import List
 from src.model.value_objects.application_files import ApplicationFiles
 from src.model.services.llm_service import LlmService
 from src.model.services.message_parser import MessageParser
-from src.model.value_objects.infrastructure_files import InfrastructureFiles
+from src.model.value_objects.interface_files import InterfaceFiles
 from src.model.value_objects.message import Message
 
 
@@ -44,7 +44,7 @@ class InterfaceGenerator:
             # Return a default message if the file doesn't exist
             return f"Prompt file '{filename}' not found in {current_dir}"
 
-    def generate_interface(self, application_services: ApplicationFiles) -> InfrastructureFiles:
+    def generate_interface(self, application_services: ApplicationFiles) -> InterfaceFiles:
         """                                                                                                                                   
         Generates CLI interface code based on the provided application services.                                                                        
 
@@ -52,7 +52,7 @@ class InterfaceGenerator:
             application_services: The existing application services to reference when generating CLI interface code.                                                                
 
         Returns:                                                                                                                              
-            An InfrastructureFiles object containing the generated CLI interface code.                                                                  
+            An InterfaceFiles object containing the generated CLI interface code.                                                                  
         """
         if not application_services.files:
             raise ValueError("Application services cannot be empty")
@@ -83,11 +83,16 @@ class InterfaceGenerator:
         # Parse the files from the response
         files_dict = self.message_parser.parse_files_from_message(response)
 
-        # Convert to InfrastructureFiles
-        infra_files = InfrastructureFiles()
+        # Convert to InterfaceFiles
+        interface_files = InterfaceFiles()
 
-        # Add each file, ensuring they're in the src/infrastructure directory
+        # Add each file, ensuring they're in the src/interface directory
         for path, content in files_dict.files.items():
-            infra_files.add_file(path, content)
+            # Adjust paths if needed - if files were generated with infrastructure paths
+            if path.startswith('src/infrastructure/'):
+                new_path = path.replace('src/infrastructure/', 'src/interface/')
+                interface_files.add_file(new_path, content)
+            else:
+                interface_files.add_file(path, content)
 
-        return infra_files
+        return interface_files

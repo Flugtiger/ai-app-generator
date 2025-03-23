@@ -4,6 +4,7 @@ from typing import List
 from src.model.services.interface_generator.interface_generator import InterfaceGenerator
 from src.model.services.application_services_service import ApplicationServicesService
 from src.model.services.files_dictionary_service import FilesDictionaryService
+from src.model.value_objects.interface_files import InterfaceFiles
 
 
 class GenerateInterfaceInput(BaseModel):
@@ -53,13 +54,13 @@ class InterfaceGeneratorCommands:
         application_services = ApplicationServicesService.read_from_directory(input_data.project_root)
 
         # Generate interface code
-        infrastructure_files = self.interface_generator.generate_interface(application_services)
+        interface_files = self.interface_generator.generate_interface(application_services)
 
         # Write the generated files to the project
-        FilesDictionaryService.write_to_directory(infrastructure_files, input_data.project_root)
+        FilesDictionaryService.write_to_directory(interface_files, input_data.project_root)
 
         # Return the output
         return GenerateInterfaceOutput(
-            generated_files=list(infrastructure_files.files.keys()),
+            generated_files=list(interface_files.files.keys()),
             message="CLI interface generated successfully."
         )
