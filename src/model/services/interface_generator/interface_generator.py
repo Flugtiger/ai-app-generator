@@ -54,7 +54,8 @@ class InterfaceGenerator:
         Returns:                                                                                                                              
             An InfrastructureFiles object containing the generated CLI interface code.                                                                  
         """
-        assert application_services, "Application services cannot be empty"
+        if not application_services.files:
+            raise ValueError("Application services cannot be empty")
 
         # Prepare the application services files text
         app_services_files = ""
