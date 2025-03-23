@@ -86,9 +86,9 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
             if not class_name_node:
                 continue
 
-            # Get the class declaration including decorators
-            class_declaration = self._get_node_text(source_code, class_node)
-
+            # Extract just the class header (not the entire class body)
+            class_header = self._extract_class_header(source_code, class_node)
+            
             # Find the constructor method
             constructor = None
             function_defs = self._find_nodes_by_type(class_node, "function_definition")
@@ -107,8 +107,8 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
                 # Get the constructor docstring if it exists
                 docstring = self._get_docstring(source_code, constructor)
 
-                # Add the class declaration and constructor signature to the result
-                class_text = f"{class_declaration}\n    {constructor_sig}"
+                # Add the class header and constructor signature to the result
+                class_text = f"{class_header}\n    {constructor_sig}"
                 if docstring:
                     class_text += f"\n        {docstring}\n        pass"
                 else:
@@ -116,8 +116,8 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
 
                 result_parts.append(class_text)
             else:
-                # If no constructor is found, add just the class declaration
-                result_parts.append(f"{class_declaration}\n    pass")
+                # If no constructor is found, add just the class header
+                result_parts.append(f"{class_header}\n    pass")
 
         return "\n\n".join(result_parts)
 
@@ -229,3 +229,43 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
                 return self._get_node_text(source_code, string_node)
 
         return None
+        
+    def _extract_class_header(self, source_code: str, class_node) -> str:
+        """
+        Extract just the class header (class name, inheritance, etc.) without the body.
+        
+        Args:
+            source_code: The original source code.
+            class_node: The class definition node.
+            
+        Returns:
+            The class header as a string.
+        """
+        # Find the colon that marks the end of the class header
+        class_text = self._get_node_text(source_code, class_node)
+        header_end = class_text.find(':') + 1
+        class_header = class_text[:header_end]
+        
+        # Extract the docstring if it exists
+        docstring = None
+        body = None
+        
+        # Find the body block
+        for child in class_node.children:
+            if child.type == "block":
+                body = child
+                break
+                
+        if body and body.children:
+            # Check if the first statement is a string (docstring)
+            first_stmt = body.children[0]
+            if first_stmt.type == "expression_statement":
+                string_node = self._find_node_by_type(first_stmt, "string")
+                if string_node:
+                    docstring = self._get_node_text(source_code, string_node)
+        
+        # Add the docstring to the header if it exists
+        if docstring:
+            class_header += f"\n    {docstring}"
+            
+        return class_header

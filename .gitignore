@@ -1,6 +1,6 @@
 .aider*
 __pycache__
-venv
+.venv
 data
 generated
 *.egg-info

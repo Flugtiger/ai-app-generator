@@ -1,7 +1,6 @@
 import re
 from pydantic import BaseModel
 from typing import Dict, Optional
-from src.model.services.code_compression_service import CodeCompressionService
 
 
 class FilesDictionary(BaseModel):
@@ -150,15 +149,3 @@ class FilesDictionary(BaseModel):
             i += 1
 
         return '\n'.join(result_lines)
-        
-    def compress_to_constructor_signatures(self, compression_service: CodeCompressionService) -> 'FilesDictionary':
-        """
-        Compresses this FilesDictionary so that only class declarations and constructor signatures are left in the source files.
-        
-        Args:
-            compression_service: The CodeCompressionService to use for compression.
-            
-        Returns:
-            A new FilesDictionary where only class declarations and constructor signatures are left in the contents of the files.
-        """
-        return compression_service.compress_to_constructor_signatures(self)
