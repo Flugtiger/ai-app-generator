@@ -31,6 +31,10 @@ from src.application.infrastructure_generator_service import (
     GenerateInfrastructureInput,
     InfrastructureGeneratorCommands,
 )
+from src.application.interface_generator_service import (
+    GenerateInterfaceInput,
+    InterfaceGeneratorCommands,
+)
 from src.infrastructure.repositories.command.command_file_repository import (
     CommandFileRepository,
 )
@@ -49,6 +53,7 @@ from src.model.services.llm_service import LlmService
 from src.model.services.model_generator.model_generator import ModelGenerator
 from src.model.services.application_services_generator.application_services_generator import ApplicationServicesGenerator
 from src.model.services.infrastructure_generator.infrastructure_generator import InfrastructureGenerator
+from src.model.services.interface_generator.interface_generator import InterfaceGenerator
 from src.model.services.domain_model_service import DomainModelService
 from src.model.services.application_services_service import ApplicationServicesService
 
@@ -141,6 +146,7 @@ class CommandLineInterface:
         model_generator = ModelGenerator(llm_service)
         application_services_generator = ApplicationServicesGenerator(llm_service)
         infrastructure_generator = InfrastructureGenerator(llm_service)
+        interface_generator = InterfaceGenerator(llm_service)
 
         self.model_generator_commands = ModelGeneratorCommands(
             self.model_requirement_repository,
@@ -155,6 +161,10 @@ class CommandLineInterface:
         self.infrastructure_generator_commands = InfrastructureGeneratorCommands(
             self.infra_requirement_repository,
             infrastructure_generator
+        )
+        
+        self.interface_generator_commands = InterfaceGeneratorCommands(
+            interface_generator
         )
 
         # Set up argument parser
@@ -266,6 +276,18 @@ class CommandLineInterface:
             nargs="+",
             help="IDs of infrastructure requirements to use (optional, uses all if not specified)"
         )
+        
+        # Generate interface command
+        gen_interface_parser = subparsers.add_parser(
+            "generate-interface",
+            help="Generate CLI interface from application services"
+        )
+        gen_interface_parser.add_argument(
+            "--output-dir",
+            type=str,
+            default="generated",
+            help="Directory to save generated interface files"
+        )
 
         return parser
 
@@ -302,6 +324,8 @@ class CommandLineInterface:
                 return self._handle_generate_application_services(args)
             elif args.command == "generate-infrastructure":
                 return self._handle_generate_infrastructure(args)
+            elif args.command == "generate-interface":
+                return self._handle_generate_interface(args)
             else:
                 print(f"Unknown command: {args.command}")
                 return 1
@@ -446,6 +470,28 @@ class CommandLineInterface:
         result = self.infrastructure_generator_commands.generate_infrastructure(input_data)
 
         print(f"Generated {result.files_count} infrastructure files saved to {args.output_dir}/")
+        return 0
+        
+    def _handle_generate_interface(self, args) -> int:
+        """
+        Handle the generate-interface command.
+
+        Args:
+            args: Command-line arguments
+
+        Returns:
+            Exit code (0 for success)
+        """
+        # Create input with project path
+        input_data = GenerateInterfaceInput(
+            project_root=args.output_dir
+        )
+
+        # Generate the interface code and write to disk
+        result = self.interface_generator_commands.generate_interface(input_data)
+
+        print(f"Generated {len(result.generated_files)} interface files saved to {args.output_dir}/")
+        print(result.message)
         return 0
 
 
