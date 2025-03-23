@@ -195,31 +195,27 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
         parameters = self._find_node_by_type(constructor_node, "parameters")
 
         if parameters:
-            # Get the entire function definition line(s) up to the colon
+            # Find the colon that marks the end of the signature
             func_text = source_code[constructor_node.start_byte:constructor_node.end_byte]
             
-            # For multi-line signatures, we need to find the colon that actually ends the signature
-            # not just the first colon (which could be in a type annotation)
-            lines = func_text.split('\n')
-            
-            # Start with the function definition line
-            result_lines = [lines[0]]
-            
-            # Process parameter lines
-            for i in range(1, len(lines)):
-                line = lines[i]
-                result_lines.append(line)
+            # Find the block node that contains the function body
+            block_node = self._find_node_by_type(constructor_node, "block")
+            if block_node:
+                # Get just the signature part (everything before the block)
+                signature_text = source_code[constructor_node.start_byte:block_node.start_byte].strip()
                 
-                # If this line contains the ending colon, we're done
-                if ':' in line and not any(x in line for x in ['(', '[']):
-                    break
+                # Ensure it ends with a colon
+                if not signature_text.endswith(':'):
+                    signature_text += ':'
                     
-            # Join the lines back together and ensure we have the colon
-            result = '\n'.join(result_lines)
-            if ':' not in result:
-                result += ':'
+                return signature_text
+            
+            # Fallback if we can't find the block
+            colon_pos = func_text.find(':')
+            if colon_pos != -1:
+                return func_text[:colon_pos + 1]
                 
-            return result
+            return func_text + ':'
 
         return "def __init__(self):"
 
