@@ -5,22 +5,22 @@ from src.model.value_objects.application_files import ApplicationFiles
 from src.model.services.files_dictionary_service import FilesDictionaryService
 
 
-class ApplicationServicesService:
+class ApplicationFilesService:
     """
-    Service for reading and writing ApplicationServices objects from/to a file system.
+    Service for reading and writing ApplicationFiles objects from/to a file system.
     """
 
     @staticmethod
     def read_from_directory(project_root: str, ignore_patterns: Optional[List[str]] = None) -> ApplicationFiles:
         """
-        Reads an ApplicationServices from a directory, including only files inside 'src/application'.
+        Reads an ApplicationFiles from a directory, including only files inside 'src/application'.
 
         Args:
             project_root: The root directory of the project.
             ignore_patterns: Optional list of patterns to ignore (e.g., '*.pyc', '__pycache__').
 
         Returns:
-            An ApplicationServices containing all application service files from the directory.
+            An ApplicationFiles containing all application service files from the directory.
         """
         if ignore_patterns is None:
             ignore_patterns = ['__pycache__', '*.pyc', '.git', '.vscode', '.idea']
@@ -36,7 +36,7 @@ class ApplicationServicesService:
         # Read only files from the application directory
         files_dict = FilesDictionaryService.read_from_directory(str(app_dir), ignore_patterns)
 
-        # Create a new ApplicationServices
+        # Create a new ApplicationFiles
         app_services = ApplicationFiles()
 
         # Add files to the application services with corrected paths
@@ -53,10 +53,10 @@ class ApplicationServicesService:
     @staticmethod
     def write_to_directory(app_services: ApplicationFiles, project_root: str, create_dirs: bool = True) -> None:
         """
-        Writes an ApplicationServices to a directory.
+        Writes an ApplicationFiles to a directory.
 
         Args:
-            app_services: The ApplicationServices to write.
+            app_services: The ApplicationFiles to write.
             project_root: The root directory of the project.
             create_dirs: Whether to create directories if they don't exist.
         """

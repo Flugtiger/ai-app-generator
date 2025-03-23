@@ -5,7 +5,7 @@ from src.model.value_objects.domain_model_files import DomainModelFiles
 from src.model.services.files_dictionary_service import FilesDictionaryService
 
 
-class DomainModelService:
+class DomainModelFilesService:
     """
     Service for reading and writing DomainModel objects from/to a file system.
     """

@@ -54,8 +54,8 @@ from src.model.services.model_generator.model_generator import ModelGenerator
 from src.model.services.application_services_generator.application_services_generator import ApplicationServicesGenerator
 from src.model.services.infrastructure_generator.infrastructure_generator import InfrastructureGenerator
 from src.model.services.interface_generator.interface_generator import InterfaceGenerator
-from src.model.services.domain_model_service import DomainModelService
-from src.model.services.application_services_service import ApplicationServicesService
+from src.model.services.domain_model_files_service import DomainModelFilesService
+from src.model.services.application_files_service import ApplicationFilesService
 
 
 class CliError(Exception):
@@ -162,7 +162,7 @@ class CommandLineInterface:
             self.infra_requirement_repository,
             infrastructure_generator
         )
-        
+
         self.interface_generator_commands = InterfaceGeneratorCommands(
             interface_generator
         )
@@ -276,7 +276,7 @@ class CommandLineInterface:
             nargs="+",
             help="IDs of infrastructure requirements to use (optional, uses all if not specified)"
         )
-        
+
         # Generate interface command
         gen_interface_parser = subparsers.add_parser(
             "generate-interface",
@@ -471,7 +471,7 @@ class CommandLineInterface:
 
         print(f"Generated {result.files_count} infrastructure files saved to {args.output_dir}/")
         return 0
-        
+
     def _handle_generate_interface(self, args) -> int:
         """
         Handle the generate-interface command.

@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import List
 
 from src.model.services.interface_generator.interface_generator import InterfaceGenerator
-from src.model.services.application_services_service import ApplicationServicesService
+from src.model.services.application_files_service import ApplicationFilesService
 from src.model.services.files_dictionary_service import FilesDictionaryService
 from src.model.value_objects.interface_files import InterfaceFiles
 
@@ -51,7 +51,7 @@ class InterfaceGeneratorCommands:
             Output containing the list of generated files and a success message.
         """
         # Read application services from the project
-        application_services = ApplicationServicesService.read_from_directory(input_data.project_root)
+        application_services = ApplicationFilesService.read_from_directory(input_data.project_root)
 
         # Generate interface code
         interface_files = self.interface_generator.generate_interface(application_services)

@@ -5,7 +5,7 @@ from src.model.infra_requirement.infra_requirement import InfraRequirement
 from src.model.infra_requirement.infra_requirement_id import InfraRequirementId
 from src.model.infra_requirement.infra_requirement_repository import InfraRequirementRepository
 from src.model.services.infrastructure_generator.infrastructure_generator import InfrastructureGenerator
-from src.model.services.domain_model_service import DomainModelService
+from src.model.services.domain_model_files_service import DomainModelFilesService
 from src.model.value_objects.infrastructure_files import InfrastructureFiles
 
 
@@ -71,7 +71,7 @@ class InfrastructureGeneratorCommands:
             raise ValueError("No infrastructure requirements found")
 
         # Read the existing domain model from the project
-        domain_model = DomainModelService.read_from_directory(input_data.project_path)
+        domain_model = DomainModelFilesService.read_from_directory(input_data.project_path)
 
         # Generate the infrastructure code
         infrastructure_files = self.infrastructure_generator.generate_infrastructure(
@@ -80,7 +80,7 @@ class InfrastructureGeneratorCommands:
         )
 
         # Write the generated files to the project directory
-        DomainModelService.write_to_directory(
+        DomainModelFilesService.write_to_directory(
             infrastructure_files,
             input_data.project_path,
             create_dirs=True

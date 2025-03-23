@@ -187,6 +187,7 @@ class File2Class:
         self.assertIn("domain_model_generator: DomainModelGenerator,", result_file)
         self.assertIn("application_files_service: ApplicationFilesService,", result_file)
         self.assertIn("domain_model_files_service: DomainModelFilesService", result_file)
+        print(result_file)
 
 
 if __name__ == "__main__":
