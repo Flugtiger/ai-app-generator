@@ -6,7 +6,7 @@ from src.model.value_objects.files_dictionary import FilesDictionary
 class CodeCompressionService(ABC):
 
     @abstractmethod
-    def compress_to_constructor_signatures(files: FilesDictionary) -> FilesDictionary:
+    def compress_to_constructor_signatures(self, files: FilesDictionary) -> FilesDictionary:
         """
         Compresses the given FilesDictionary so that only class declarations and constructor signatures are left in the source files.
 
