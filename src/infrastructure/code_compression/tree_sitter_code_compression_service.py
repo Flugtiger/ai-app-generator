@@ -102,6 +102,11 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
             if constructor:
                 # Get the constructor signature
                 constructor_sig = self._get_constructor_signature(source_code, constructor)
+                
+                # Preserve indentation for multi-line signatures
+                if '\n' in constructor_sig:
+                    # Ensure proper indentation for multi-line signatures
+                    constructor_sig = constructor_sig.replace('\n', '\n    ')
 
                 # Get the constructor docstring if it exists
                 docstring = self._get_docstring(source_code, constructor)
@@ -190,12 +195,17 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
         parameters = self._find_node_by_type(constructor_node, "parameters")
 
         if parameters:
-            # Get the function definition up to the colon
-            func_def = source_code[constructor_node.start_byte:constructor_node.end_byte]
-
-            # Extract just the signature (def __init__(self, ...):)
-            signature_end = func_def.find(':') + 1
-            return func_def[:signature_end]
+            # Get the entire function definition line(s) up to the colon
+            func_text = source_code[constructor_node.start_byte:constructor_node.end_byte]
+            
+            # Find the colon that ends the signature
+            colon_pos = func_text.find(':')
+            if colon_pos != -1:
+                # Include everything up to and including the colon
+                return func_text[:colon_pos + 1]
+            
+            # If no colon found (shouldn't happen), return the whole function text
+            return func_text
 
         return "def __init__(self):"
 
