@@ -198,14 +198,28 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
             # Get the entire function definition line(s) up to the colon
             func_text = source_code[constructor_node.start_byte:constructor_node.end_byte]
             
-            # Find the colon that ends the signature
-            colon_pos = func_text.find(':')
-            if colon_pos != -1:
-                # Include everything up to and including the colon
-                return func_text[:colon_pos + 1]
+            # For multi-line signatures, we need to find the colon that actually ends the signature
+            # not just the first colon (which could be in a type annotation)
+            lines = func_text.split('\n')
             
-            # If no colon found (shouldn't happen), return the whole function text
-            return func_text
+            # Start with the function definition line
+            result_lines = [lines[0]]
+            
+            # Process parameter lines
+            for i in range(1, len(lines)):
+                line = lines[i]
+                result_lines.append(line)
+                
+                # If this line contains the ending colon, we're done
+                if ':' in line and not any(x in line for x in ['(', '[']):
+                    break
+                    
+            # Join the lines back together and ensure we have the colon
+            result = '\n'.join(result_lines)
+            if ':' not in result:
+                result += ':'
+                
+            return result
 
         return "def __init__(self):"
 
