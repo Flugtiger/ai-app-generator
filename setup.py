@@ -9,14 +9,14 @@ setup(
     packages=find_packages(),
     python_requires=">=3.8",
     install_requires=[
-        "pydantic>=1.9.0,<2.0.0",
+        "pydantic>=2.0.0",
         "typer>=0.4.0",
         "rich>=10.0.0",
         "click>=8.0.0",
     ],
     entry_points={
         "console_scripts": [
-            "ddd-model-generator=src.infrastructure.cli.cli:main",
+            "ai-app-generator=src.infrastructure.cli.cli:main",
         ],
     },
     classifiers=[
