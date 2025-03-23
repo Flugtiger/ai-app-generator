@@ -1,5 +1,4 @@
 from typing import List, Optional
-from tree_sitter import Parser, Language
 
 from src.model.services.code_compression_service import CodeCompressionService
 from src.model.value_objects.files_dictionary import FilesDictionary
@@ -88,7 +87,7 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
 
             # Extract just the class header (not the entire class body)
             class_header = self._extract_class_header(source_code, class_node)
-            
+
             # Find the constructor method
             constructor = None
             function_defs = self._find_nodes_by_type(class_node, "function_definition")
@@ -229,15 +228,15 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
                 return self._get_node_text(source_code, string_node)
 
         return None
-        
+
     def _extract_class_header(self, source_code: str, class_node) -> str:
         """
         Extract just the class header (class name, inheritance, etc.) without the body.
-        
+
         Args:
             source_code: The original source code.
             class_node: The class definition node.
-            
+
         Returns:
             The class header as a string.
         """
@@ -245,17 +244,17 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
         class_text = self._get_node_text(source_code, class_node)
         header_end = class_text.find(':') + 1
         class_header = class_text[:header_end]
-        
+
         # Extract the docstring if it exists
         docstring = None
         body = None
-        
+
         # Find the body block
         for child in class_node.children:
             if child.type == "block":
                 body = child
                 break
-                
+
         if body and body.children:
             # Check if the first statement is a string (docstring)
             first_stmt = body.children[0]
@@ -263,9 +262,9 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
                 string_node = self._find_node_by_type(first_stmt, "string")
                 if string_node:
                     docstring = self._get_node_text(source_code, string_node)
-        
+
         # Add the docstring to the header if it exists
         if docstring:
             class_header += f"\n    {docstring}"
-            
+
         return class_header

@@ -1,3 +1,4 @@
+import os
 import unittest
 from src.infrastructure.code_compression.tree_sitter_code_compression_service import TreeSitterCodeCompressionService
 from src.model.value_objects.files_dictionary import FilesDictionary
@@ -13,7 +14,7 @@ class TestTreeSitterCodeCompressionService(unittest.TestCase):
         Set up the test environment.
         """
         self.service = TreeSitterCodeCompressionService()
-        
+
     def test_compress_empty_files_dictionary(self):
         """
         Test compressing an empty FilesDictionary.
@@ -21,7 +22,7 @@ class TestTreeSitterCodeCompressionService(unittest.TestCase):
         files = FilesDictionary()
         result = self.service.compress_to_constructor_signatures(files)
         self.assertEqual(len(result.files), 0)
-        
+
     def test_compress_non_python_files(self):
         """
         Test compressing a FilesDictionary with non-Python files.
@@ -29,10 +30,10 @@ class TestTreeSitterCodeCompressionService(unittest.TestCase):
         files = FilesDictionary()
         files.add_file("test.txt", "This is a text file")
         files.add_file("test.md", "# Markdown file")
-        
+
         result = self.service.compress_to_constructor_signatures(files)
         self.assertEqual(len(result.files), 0)
-        
+
     def test_compress_python_file_without_classes(self):
         """
         Test compressing a Python file without any classes.
@@ -45,10 +46,10 @@ def main():
 if __name__ == "__main__":
     main()
 """)
-        
+
         result = self.service.compress_to_constructor_signatures(files)
         self.assertEqual(len(result.files), 0)
-        
+
     def test_compress_python_file_with_class_no_constructor(self):
         """
         Test compressing a Python file with a class but no constructor.
@@ -61,17 +62,17 @@ class TestClass:
     def method(self):
         pass
 """)
-        
+
         result = self.service.compress_to_constructor_signatures(files)
         self.assertEqual(len(result.files), 1)
         self.assertIn("test.py", result.files)
-        
+
         # The result should contain the class declaration and a pass statement
         compressed = result.files["test.py"]
         self.assertIn("class TestClass:", compressed)
         self.assertIn("    pass", compressed)
         self.assertNotIn("def method", compressed)
-        
+
     def test_compress_python_file_with_class_and_constructor(self):
         """
         Test compressing a Python file with a class and constructor.
@@ -89,11 +90,11 @@ class TestClass:
     def method(self):
         pass
 """)
-        
+
         result = self.service.compress_to_constructor_signatures(files)
         self.assertEqual(len(result.files), 1)
         self.assertIn("test.py", result.files)
-        
+
         # The result should contain the class declaration and constructor signature
         compressed = result.files["test.py"]
         self.assertIn("class TestClass:", compressed)
@@ -101,7 +102,7 @@ class TestClass:
         self.assertIn('"""Constructor for TestClass."""', compressed)
         self.assertNotIn("self.param1 = param1", compressed)
         self.assertNotIn("def method", compressed)
-        
+
     def test_compress_python_file_with_multiple_classes(self):
         """
         Test compressing a Python file with multiple classes.
@@ -127,11 +128,11 @@ class Class3:
     def method(self):
         pass
 """)
-        
+
         result = self.service.compress_to_constructor_signatures(files)
         self.assertEqual(len(result.files), 1)
         self.assertIn("test.py", result.files)
-        
+
         # The result should contain all three class declarations with appropriate constructors
         compressed = result.files["test.py"]
         self.assertIn("class Class1:", compressed)
@@ -141,7 +142,7 @@ class Class3:
         self.assertIn('"""Constructor for Class2."""', compressed)
         self.assertIn("class Class3:", compressed)
         self.assertNotIn("def method", compressed)
-        
+
     def test_compress_multiple_python_files(self):
         """
         Test compressing multiple Python files.
@@ -158,19 +159,34 @@ class File2Class:
         pass
 """)
         files.add_file("file3.txt", "Not a Python file")
-        
+
         result = self.service.compress_to_constructor_signatures(files)
         self.assertEqual(len(result.files), 2)
         self.assertIn("file1.py", result.files)
         self.assertIn("file2.py", result.files)
         self.assertNotIn("file3.txt", result.files)
-        
+
         # Check file1.py content
         self.assertIn("def __init__(self, param):", result.files["file1.py"])
-        
+
         # Check file2.py content
         self.assertIn("class File2Class:", result.files["file2.py"])
         self.assertIn("    pass", result.files["file2.py"])
+
+    def test_compress_generator_service_py(self):
+        files = FilesDictionary()
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'generator_service.py'), 'r') as f:
+            files.add_file("generator_service.py", f.read())
+
+        result = self.service.compress_to_constructor_signatures(files)
+
+        result_file = result.files["generator_service.py"]
+        self.assertIn("command_repository: CommandRepository,", result_file)
+        self.assertIn("model_requirement_repository: ModelRequirementRepository,", result_file)
+        self.assertIn("application_generator: ApplicationGenerator,", result_file)
+        self.assertIn("domain_model_generator: DomainModelGenerator,", result_file)
+        self.assertIn("application_files_service: ApplicationFilesService,", result_file)
+        self.assertIn("domain_model_files_service: DomainModelFilesService", result_file)
 
 
 if __name__ == "__main__":
