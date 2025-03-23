@@ -1,0 +1,28 @@
+# CLI Interface Design Philosophy
+
+When designing a CLI interface, follow these principles:
+
+## User-Centric Design
+- Make the interface intuitive and easy to use
+- Use consistent command naming and structure
+- Provide helpful error messages and guidance
+
+## Completeness
+- Expose all functionality of the application services
+- Support all parameters and options needed for each command
+- Provide sensible defaults where appropriate
+
+## Robustness
+- Handle errors gracefully
+- Validate input before processing
+- Provide clear feedback on success or failure
+
+## Documentation
+- Include help text for all commands and options
+- Provide usage examples
+- Document expected input and output formats
+
+## Implementation Details
+- Use argparse for command-line parsing
+- Follow a consistent pattern for command implementation
+- Separate concerns: parsing, validation, execution, and output formatting
