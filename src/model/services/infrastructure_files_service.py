@@ -14,12 +14,3 @@ class InfrastructureFilesService(BaseFilesService[InfrastructureFiles]):
         Initialize the service with infrastructure files configuration.
         """
         super().__init__('infrastructure', InfrastructureFiles)
-
-    def create_empty_infrastructure_files(self) -> InfrastructureFiles:
-        """
-        Creates an empty InfrastructureFiles.
-
-        Returns:
-            An empty InfrastructureFiles.
-        """
-        return self.create_empty_files()

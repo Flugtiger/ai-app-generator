@@ -14,12 +14,3 @@ class ApplicationFilesService(BaseFilesService[ApplicationFiles]):
         Initialize the service with application files configuration.
         """
         super().__init__('application', ApplicationFiles)
-
-    def create_empty_application_files(self) -> ApplicationFiles:
-        """
-        Creates an empty ApplicationFiles.
-
-        Returns:
-            An empty ApplicationFiles.
-        """
-        return self.create_empty_files()

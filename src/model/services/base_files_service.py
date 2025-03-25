@@ -74,12 +74,3 @@ class BaseFilesService(Generic[T]):
         """
         # Write the files to the directory
         FilesDictionaryService.write_to_directory(files, project_root, create_dirs)
-
-    def create_empty_files(self) -> T:
-        """
-        Creates an empty instance of the specialized FilesDictionary.
-
-        Returns:
-            An empty specialized FilesDictionary.
-        """
-        return self.file_class()

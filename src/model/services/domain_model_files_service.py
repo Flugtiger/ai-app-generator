@@ -14,12 +14,3 @@ class DomainModelFilesService(BaseFilesService[DomainModelFiles]):
         Initialize the service with domain model configuration.
         """
         super().__init__('model', DomainModelFiles)
-
-    def create_empty_domain_model(self) -> DomainModelFiles:
-        """
-        Creates an empty DomainModel.
-
-        Returns:
-            An empty DomainModel.
-        """
-        return self.create_empty_files()
