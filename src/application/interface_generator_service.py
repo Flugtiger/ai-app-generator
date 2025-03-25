@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from typing import List
 
+from src.model.services.domain_model_files_service import DomainModelFilesService
+from src.model.services.infrastructure_files_service import InfrastructureFilesService
 from src.model.services.interface_generator.interface_generator import InterfaceGenerator
 from src.model.services.application_files_service import ApplicationFilesService
 from src.model.services.files_dictionary_service import FilesDictionaryService
@@ -39,6 +41,9 @@ class InterfaceGeneratorCommands:
             interface_generator: The domain service that generates interface code.
         """
         self.interface_generator = interface_generator
+        self.application_files_service = ApplicationFilesService()
+        self.model_files_service = DomainModelFilesService()
+        self.infra_files_service = InfrastructureFilesService()
 
     def generate_interface(self, input_data: GenerateInterfaceInput) -> GenerateInterfaceOutput:
         """
@@ -51,10 +56,12 @@ class InterfaceGeneratorCommands:
             Output containing the list of generated files and a success message.
         """
         # Read application services from the project
-        application_services = ApplicationFilesService.read_from_directory(input_data.project_root)
+        application_services = self.application_files_service.read_from_directory(input_data.project_root)
+        model_files = self.model_files_service.read_from_directory(input_data.project_root)
+        infra_files = self.infra_files_service.read_from_directory(input_data.project_root)
 
         # Generate interface code
-        interface_files = self.interface_generator.generate_interface(application_services)
+        interface_files = self.interface_generator.generate_interface(application_services, model_files, infra_files)
 
         # Write the generated files to the project
         FilesDictionaryService.write_to_directory(interface_files, input_data.project_root)

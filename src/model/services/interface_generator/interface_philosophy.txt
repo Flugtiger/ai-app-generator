@@ -24,4 +24,4 @@ When designing a CLI interface, follow these principles:
 - Use argparse for command-line parsing
 - Follow a consistent pattern for command implementation
 - Separate concerns: parsing, validation, execution, and output formatting
-- The CLI MUST be implemented in the src/infrastructure/cli directory.
+- The CLI interface MUST be implemented in the src/interface directory.

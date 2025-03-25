@@ -35,6 +35,7 @@ from src.application.interface_generator_service import (
     GenerateInterfaceInput,
     InterfaceGeneratorCommands,
 )
+from src.infrastructure.code_compression.tree_sitter_code_compression_service import TreeSitterCodeCompressionService
 from src.infrastructure.repositories.command.command_file_repository import (
     CommandFileRepository,
 )
@@ -143,10 +144,11 @@ class CommandLineInterface:
 
         # Initialize services with Langchain LLM service
         llm_service = LangchainLlmService()
+        code_compression_service = TreeSitterCodeCompressionService()
         model_generator = ModelGenerator(llm_service)
         application_services_generator = ApplicationServicesGenerator(llm_service)
         infrastructure_generator = InfrastructureGenerator(llm_service)
-        interface_generator = InterfaceGenerator(llm_service)
+        interface_generator = InterfaceGenerator(llm_service, code_compression_service)
 
         self.model_generator_commands = ModelGeneratorCommands(
             self.model_requirement_repository,

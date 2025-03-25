@@ -1,9 +1,13 @@
 import os
 from pathlib import Path
 from typing import List
+from src.model.services.code_compression_service import CodeCompressionService
 from src.model.value_objects.application_files import ApplicationFiles
 from src.model.services.llm_service import LlmService
 from src.model.services.message_parser import MessageParser
+from src.model.value_objects.domain_model_files import DomainModelFiles
+from src.model.value_objects.files_dictionary import FilesDictionary
+from src.model.value_objects.infrastructure_files import InfrastructureFiles
 from src.model.value_objects.interface_files import InterfaceFiles
 from src.model.value_objects.message import Message
 
@@ -14,14 +18,16 @@ class InterfaceGenerator:
     Takes the Application Services and generates the appropriate CLI implementation.                                                                    
     """
 
-    def __init__(self, llm_service: LlmService):
+    def __init__(self, llm_service: LlmService, code_compression_service: CodeCompressionService):
         """                                                                                                                                   
         Initialize the InterfaceGenerator with a LLM service.                                                                       
 
         Args:                                                                                                                                 
             llm_service: The LLM service to use for generating the CLI interface.                                                      
+            code_compression_service: Service to compress code files before giving them to an LLM.
         """
         self.llm_service = llm_service
+        self.code_compression_service = code_compression_service
         self.message_parser = MessageParser()
 
     def _load_prompt_from_file(self, filename: str) -> str:
@@ -44,7 +50,7 @@ class InterfaceGenerator:
             # Return a default message if the file doesn't exist
             return f"Prompt file '{filename}' not found in {current_dir}"
 
-    def generate_interface(self, application_services: ApplicationFiles) -> InterfaceFiles:
+    def generate_interface(self, application_files: ApplicationFiles, model_files: DomainModelFiles, infra_files: InfrastructureFiles) -> InterfaceFiles:
         """                                                                                                                                   
         Generates CLI interface code based on the provided application services.                                                                        
 
@@ -54,13 +60,17 @@ class InterfaceGenerator:
         Returns:                                                                                                                              
             An InterfaceFiles object containing the generated CLI interface code.                                                                  
         """
-        if not application_services.files:
+        if not application_files.files:
             raise ValueError("Application services cannot be empty")
 
         # Prepare the application services files text
-        app_services_files = ""
-        for path, content in application_services.files.items():
-            app_services_files += f"\n{path}\nSOF```\n{content}\n```EOF\n"
+        app_services_files = self._serialize_files(application_files)
+
+        # Prepare the compressed domain model and infrastructure files
+        compressed_model_files = self._serialize_files(
+            self.code_compression_service.compress_to_constructor_signatures(model_files))
+        compressed_infra_files = self._serialize_files(
+            self.code_compression_service.compress_to_constructor_signatures(infra_files))
 
         # Prepare the system prompt
         roadmap = self._load_prompt_from_file("interface_roadmap.txt")
@@ -69,6 +79,10 @@ class InterfaceGenerator:
             roadmap,
             "The existing application services:",
             app_services_files,
+            "The constructor signatures of the domain model:",
+            compressed_model_files,
+            "The constructor signatures of the infrastructure code:",
+            compressed_infra_files,
             self.message_parser.get_file_template_with_example(),
             philosophy])
 
@@ -96,3 +110,9 @@ class InterfaceGenerator:
                 interface_files.add_file(path, content)
 
         return interface_files
+
+    def _serialize_files(self, files: FilesDictionary):
+        app_services_files = ""
+        for path, content in files.files.items():
+            app_services_files += f"\n{path}\nSOF```\n{content}\n```EOF\n"
+        return app_services_files
