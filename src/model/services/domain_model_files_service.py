@@ -9,26 +9,17 @@ class DomainModelFilesService(BaseFilesService[DomainModelFiles]):
     Service for reading and writing DomainModel objects from/to a file system.
     """
 
-    @classmethod
-    def read_from_directory(cls, project_root: str, ignore_patterns: Optional[List[str]] = None) -> DomainModelFiles:
+    def __init__(self):
         """
-        Reads a DomainModel from a directory, including only files inside 'src/model'.
-
-        Args:
-            project_root: The root directory of the project.
-            ignore_patterns: Optional list of patterns to ignore (e.g., '*.pyc', '__pycache__').
-
-        Returns:
-            A DomainModel containing all model files from the directory.
+        Initialize the service with domain model configuration.
         """
-        return super().read_from_directory(project_root, 'model', DomainModelFiles, ignore_patterns)
+        super().__init__('model', DomainModelFiles)
 
-    @staticmethod
-    def create_empty_domain_model() -> DomainModelFiles:
+    def create_empty_domain_model(self) -> DomainModelFiles:
         """
         Creates an empty DomainModel.
 
         Returns:
             An empty DomainModel.
         """
-        return DomainModelFiles()
+        return self.create_empty_files()
