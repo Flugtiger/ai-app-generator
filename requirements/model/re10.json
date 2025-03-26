@@ -1,3 +1,0 @@
-{
-  "requirementText": "The `ApplicationFilesService` can read and write `ApplicationFiles` given a project's root path. It only reads and writes files from/to the subfolder 'src/application'."
-}

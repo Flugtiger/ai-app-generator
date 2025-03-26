@@ -1,0 +1,3 @@
+{
+  "requirementText": "An `InfrastructureFiles` object is a specific `FilesDictionary` that makes sure that all files have a path that starts with 'src/infrastructure'."
+}

@@ -1,0 +1,3 @@
+{
+  "requirementText": "The `InfrastructureFilesService` is a concrete `BaseFilesService`. It can read and write `InfrastructureFiles` from/to the subfolder 'src/infrastructure'."
+}

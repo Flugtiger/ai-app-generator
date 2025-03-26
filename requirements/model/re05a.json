@@ -1,0 +1,3 @@
+{
+  "requirementText": "The `ApplicationFilesService` is a concrete `BaseFilesService`. It can read and write `ApplicationFiles` from/to the subfolder 'src/application'."
+}
