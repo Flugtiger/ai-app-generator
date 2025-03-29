@@ -1,0 +1,3 @@
+{
+  "requirementText": "For the following generator services, assume that the files with the static prompt texts are located in the same folder as the source files of the generators. Their file names start with the name of the generator service they belong to. The generator services contain the code to load the files. Generate empty files for the prompt text files."
+}

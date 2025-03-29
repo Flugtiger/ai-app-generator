@@ -1,0 +1,4 @@
+{
+  "name": "generateInterface",
+  "description": "As a User I can generate the interface of the application based on the existing domain model, application and infrastructure code. The files are written into the target directory (default: 'generated'). The command returns the number of generated files."
+}

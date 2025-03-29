@@ -65,12 +65,14 @@ class ModelGenerator:
         # Load the system prompt from file and format it with requirements
         roadmap = self._load_prompt_from_file("model_roadmap.txt")
         philosophy = self._load_prompt_from_file("model_philosophy.txt")
+        general_prompt = self._load_prompt_from_file("../general_prompt.txt")
         system_prompt = "\n\n".join([
             roadmap,
             "The requirements:",
             requirements_text,
             self.message_parser.get_file_template_with_example(),
-            philosophy])
+            philosophy,
+            general_prompt])
 
         # Generate the model using the LLM
         messages = [

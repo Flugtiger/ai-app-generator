@@ -4,6 +4,7 @@ from src.model.command.command_repository import CommandRepository
 from src.model.services.application_services_generator.application_services_generator import ApplicationServicesGenerator
 from src.model.services.domain_model_files_service import DomainModelFilesService
 from src.model.services.application_files_service import ApplicationFilesService
+from src.model.services.files_dictionary_service import FilesDictionaryService
 
 
 class GenerateApplicationServicesInput(BaseModel):
@@ -35,6 +36,7 @@ class ApplicationServicesGeneratorCommands:
         """
         self.command_repository = command_repository
         self.application_services_generator = application_services_generator
+        self.domain_model_files_service = DomainModelFilesService()
 
     def generate_application_services(self, input_data: GenerateApplicationServicesInput) -> GenerateApplicationServicesOutput:
         """                                                                                                                                   
@@ -50,13 +52,13 @@ class ApplicationServicesGeneratorCommands:
         commands = self.command_repository.get_all()
 
         # Read the existing domain model from disk
-        domain_model = DomainModelFilesService.read_from_directory(input_data.project_path)
+        domain_model = self.domain_model_files_service.read_from_directory(input_data.project_path)
 
         # Generate the application services
         app_services = self.application_services_generator.generate_application_services(commands, domain_model)
 
         # Write the application services to disk
-        ApplicationFilesService.write_to_directory(app_services, input_data.project_path)
+        FilesDictionaryService.write_to_directory(app_services, input_data.project_path)
 
         # Return the number of files written
         return GenerateApplicationServicesOutput(files_count=len(app_services.files))

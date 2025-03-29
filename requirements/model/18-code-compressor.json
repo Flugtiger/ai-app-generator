@@ -1,0 +1,3 @@
+{
+  "requirementText": "The `CodeCompressor` is an abstract domain service. It has a method that takes a `FilesDictionary` as parameter and returns a `FilesDictionary` where the file contents have been reduced to class declarations and constructor signatures. Do not implement this service, it's implementation will be part of the infrastructure code of the application."
+}

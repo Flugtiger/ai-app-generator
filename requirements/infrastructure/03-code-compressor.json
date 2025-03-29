@@ -1,0 +1,3 @@
+{
+  "requirementText": "To implement the `CodeCompressor`, use the python package 'tree-sitter' with the 'tree-sitter-language-pack'. Hard code the language to Python for now. Write a unit test to make sure the `CodeCompressor` implementation works as expected. It needs to be able to extract the class declarations and constructor signatures even when there are type annotations on the constructor parameters and even when the constructor is defined on multiple (3 or more) lines."
+}

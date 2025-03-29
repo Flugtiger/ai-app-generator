@@ -1,0 +1,3 @@
+{
+  "requirementText": "As a User, I want to define requirements for the infrastructure code of the application. An `InfrastructureRequirement` contains arbitrary text that describes the requirement (attribute: requirementText)."
+}

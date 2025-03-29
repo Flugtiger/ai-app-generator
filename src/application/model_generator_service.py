@@ -34,6 +34,7 @@ class ModelGeneratorCommands:
         """
         self.model_requirement_repository = model_requirement_repository
         self.model_generator = model_generator
+        self.domain_model_files_service = DomainModelFilesService()
 
     def generate_model(self, input_data: GenerateModelInput) -> GenerateModelOutput:
         """
@@ -52,7 +53,7 @@ class ModelGeneratorCommands:
         domain_model = self.model_generator.generate_model(requirements)
 
         # Write the domain model to disk using the domain model service
-        DomainModelFilesService.write_to_directory(domain_model, input_data.project_path)
+        self.domain_model_files_service.write_to_directory(domain_model, input_data.project_path)
 
         # Return the number of files written
         return GenerateModelOutput(files_count=len(domain_model.files))
