@@ -29,7 +29,7 @@ class LangchainLlmService(LlmService):
             temperature=0.0,
             streaming=True,
             callbacks=[StreamingStdOutCallbackHandler()],
-            max_tokens_to_sample=10000
+            max_tokens=50000
         )
 
     def generate_response(self, messages: List[Message]) -> Message:
