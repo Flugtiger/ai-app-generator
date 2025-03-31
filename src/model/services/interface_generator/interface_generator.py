@@ -40,15 +40,15 @@ class InterfaceGenerator:
         Returns:
             The content of the file as a string
         """
-        current_dir = Path(os.path.dirname(os.path.abspath(__file__)))
-        file_path = current_dir / filename
+        prompts_dir = Path("resources/prompts")
+        file_path = prompts_dir / filename
 
         try:
             with open(file_path, 'r') as file:
                 return file.read()
         except FileNotFoundError:
             # Return a default message if the file doesn't exist
-            return f"Prompt file '{filename}' not found in {current_dir}"
+            return f"Prompt file '{filename}' not found in {prompts_dir}"
 
     def generate_interface(self, application_files: ApplicationFiles, model_files: DomainModelFiles, infra_files: InfrastructureFiles) -> InterfaceFiles:
         """                                                                                                                                   
@@ -73,9 +73,9 @@ class InterfaceGenerator:
             self.code_compression_service.compress_to_constructor_signatures(infra_files))
 
         # Prepare the system prompt
-        roadmap = self._load_prompt_from_file("interface_roadmap.txt")
-        general_prompt = self._load_prompt_from_file("../general_prompt.txt")
-        philosophy = self._load_prompt_from_file("interface_philosophy.txt")
+        roadmap = self._load_prompt_from_file("interface_preamble.txt")
+        general_prompt = self._load_prompt_from_file("general_prompt.txt")
+        philosophy = self._load_prompt_from_file("interface_requirements.txt")
         system_prompt = "\n\n".join([
             roadmap,
             general_prompt,

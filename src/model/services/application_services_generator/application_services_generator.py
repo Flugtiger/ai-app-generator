@@ -35,15 +35,15 @@ class ApplicationServicesGenerator:
         Returns:
             The content of the file as a string
         """
-        current_dir = Path(os.path.dirname(os.path.abspath(__file__)))
-        file_path = current_dir / filename
+        prompts_dir = Path("resources/prompts")
+        file_path = prompts_dir / filename
 
         try:
             with open(file_path, 'r') as file:
                 return file.read()
         except FileNotFoundError:
             # Return a default message if the file doesn't exist
-            return f"Prompt file '{filename}' not found in {current_dir}"
+            return f"Prompt file '{filename}' not found in {prompts_dir}"
 
     def generate_application_services(self, commands: List[Command], domain_model: DomainModelFiles) -> ApplicationFiles:
         """                                                                                                                                   
@@ -67,9 +67,9 @@ class ApplicationServicesGenerator:
             domain_model_files += f"\n{path}\nSOF```\n{content}\n```EOF\n"
 
         # Prepare the system prompt
-        roadmap = self._load_prompt_from_file("application_services_roadmap.txt")
-        general_prompt = self._load_prompt_from_file("../general_prompt.txt")
-        philosophy = self._load_prompt_from_file("application_services_philosophy.txt")
+        roadmap = self._load_prompt_from_file("application_preamble.txt")
+        general_prompt = self._load_prompt_from_file("general_prompt.txt")
+        philosophy = self._load_prompt_from_file("application_requirements.txt")
         system_prompt = "\n\n".join([
             roadmap,
             general_prompt,
