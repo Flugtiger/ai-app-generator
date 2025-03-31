@@ -252,7 +252,7 @@ def simple_function():
         files = FilesDictionary()
         files.add_file("test.py", """
 def function_with_docstring():
-    """This is a docstring."""
+    \"\"\"This is a docstring.\"\"\"
     print("Hello, world!")
     return 42
 """)
@@ -272,10 +272,10 @@ def function_with_docstring():
         files = FilesDictionary()
         files.add_file("test.py", """
 class TestClass:
-    """A test class."""
+    \"\"\"A test class.\"\"\"
     
     def __init__(self, param1, param2="default"):
-        """Constructor for TestClass."""
+        \"\"\"Constructor for TestClass.\"\"\"
         self.param1 = param1
         self.param2 = param2
         
@@ -319,7 +319,7 @@ class Class1:
         
 class Class2:
     def method2(self):
-        """Method 2 docstring."""
+        \"\"\"Method 2 docstring.\"\"\"
         return "Class2.method2"
 """)
 
