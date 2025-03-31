@@ -1,0 +1,3 @@
+{
+  "requirementText": "The `MessageParser` is used in all 'Generator' services to add the expected ouput format to the system prompts and to parse the reponse messages of the LLM."
+}

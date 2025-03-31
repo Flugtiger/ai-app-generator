@@ -74,9 +74,11 @@ class InterfaceGenerator:
 
         # Prepare the system prompt
         roadmap = self._load_prompt_from_file("interface_roadmap.txt")
+        general_prompt = self._load_prompt_from_file("../general_prompt.txt")
         philosophy = self._load_prompt_from_file("interface_philosophy.txt")
         system_prompt = "\n\n".join([
             roadmap,
+            general_prompt,
             "The existing application services:",
             app_services_files,
             "The constructor signatures of the domain model:",

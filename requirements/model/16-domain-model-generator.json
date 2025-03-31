@@ -1,0 +1,3 @@
+{
+  "requirementText": "The Domain Model Generator takes as input all model requirements of the DDD model and generates the `DomainModelFiles` by using a LLM. It does this by assembling a system prompt that is made up from a preamble, the general prompt, the `ModelRequirement`s, the format of how to specify files and general requirements the generated DDD model must follow."
+}

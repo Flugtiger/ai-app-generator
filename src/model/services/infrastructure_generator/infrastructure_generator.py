@@ -70,9 +70,11 @@ class InfrastructureGenerator:
 
         # Prepare the system prompt
         roadmap = self._load_prompt_from_file("infrastructure_roadmap.txt")
+        general_prompt = self._load_prompt_from_file("../general_prompt.txt")
         philosophy = self._load_prompt_from_file("infrastructure_philosophy.txt")
         system_prompt = "\n\n".join([
             roadmap,
+            general_prompt,
             "The existing domain model:",
             domain_model_files,
             "The requirements:",

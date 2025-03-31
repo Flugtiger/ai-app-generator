@@ -1,10 +1,5 @@
-You MUST put all files inside the folder "src/infrastructure", e.g. "src/infrastructure/example_postgres_repository.py"!
-ALWAYS put different classes in different files.
-Always use the programming language the user asks for.
-Always add a comment on function level briefly describing the purpose of the function.
-NEVER add a comment for every line of code!
-Always follow the best practices for the requested languages for folder/file structure and how to package the project.
-
 General rules for how to write infrastructure code:
 - you MUST implement all abstract classes and interfaces of the domain model
 - NEVER implement classes that are not abstract or that already have an implementation inside the domain model
+- You MUST NOT generate code for dependency resolution or dependency injection as this won't be part of the infrastructure layer
+- You MUST put all files inside the folder "src/infrastructure", e.g. "src/infrastructure/example_postgres_repository.py"!

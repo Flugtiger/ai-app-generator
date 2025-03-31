@@ -1,12 +1,4 @@
-You MUST put all files inside the folder "src/application", e.g. "src/application/example_service.py"!
-ALWAYS put different classes in different files.
-Always use the programming language the user asks for.
-Always add a comment on function level briefly describing the purpose of the function.
-NEVER add a comment for every line of code!
-Always follow the best practices for the requested languages for folder/file structure and how to package the project.
-
 General requirements for application code:
-
 - usually the application code will load model aggregates from their respective repositories, call functions on them to modify their state and then save the updated aggregates in their repository.
 - the code of a specific application command must be written as a single function, all dependencies (e.g. repositories, domain services) must be specified as constructor parameters of the class where the function is inside
 - you can put multiple application command functions inside one class, if it makes sense to cluster them together
@@ -19,3 +11,4 @@ General requirements for application code:
 - only write the code that directly interacts with the model (and the mentioned DTOs), don't generate any additional services, examples, main scripts!
 - the application code must be ignorant of any infrastructure and only interact with the model (aggregates, repositories, domain services, ...)
 - The user should not be able to specify the IDs of objects that are to be newly created if not explicitly requested.
+- You MUST put all files inside the folder "src/application", e.g. "src/application/example_service.py"!

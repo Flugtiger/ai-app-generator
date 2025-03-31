@@ -1,0 +1,3 @@
+{
+  "requirementText": "The Application Generator takes as input all `Command`s and the `DomainModelFiles` of the existing domain model and generates the `ApplicationFiles` by using a LLM. It does this by assembling a system prompt that is made up from a preamble, the general prompt, the `Command`s, the `DomainModelFiles`, the format of how to specify files and the general requirements the application code must follow."
+}
