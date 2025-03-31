@@ -2,7 +2,7 @@ General requirements for a clean DDD model that you MUST follow:
 - use pydantics `BaseModel` as the base for all classes that need to be serialized (e.g. aggregates)
 - use pydantic V2 syntax
 - IDs should have their own value object class
-- IDs of aggregates and entities are auto generated when a fresh object is created.
+- IDs of aggregates are set by the concrete repositories when an object is saved for the first time
 - aggregates must only reference other aggregates via the ID of the aggregate root
 - generate a Repository for each Aggregate
 - a Repository MUST be abstract (the implementation is not part of the model)

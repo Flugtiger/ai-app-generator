@@ -1,3 +1,3 @@
 {
-  "requirementText": "Implement a generic FileRepository class that reads and writes model aggregates from/to json files. Use pydantic V2 APIs to serialize the model classes. Have all repositories use the generic FileRepository but with individual folders for their json files. The common base folder should be 'data'."
+  "requirementText": "Implement a generic FileRepository class that reads and writes model aggregates from/to json files. Use pydantic V2 APIs to (de-)serialize the model classes. Have all repositories use the generic FileRepository but with individual folders for their json files. The common base folder should be 'data'. IDs are generated incrementally as natural numbers starting at 1. IDs should have a short prefix (default: 2 characters) that determines the type of object it belongs to. When a `FileRepository` is initialized, it loads the next ID that is available for new objects by scanning the json files in it's specific folder."
 }
