@@ -1,3 +1,4 @@
+import json
 import os
 from typing import List, Dict, Any
 
@@ -5,21 +6,10 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.callbacks.base import BaseCallbackHandler
+from langchain_core.callbacks.usage import get_usage_metadata_callback
 
 from src.model.services.llm_service import LlmService
 from src.model.value_objects.message import Message
-
-
-class TokenUsageCallbackHandler(BaseCallbackHandler):
-    """Callback handler for tracking token usage."""
-    
-    def __init__(self):
-        self.usage_stats: Dict[str, Any] = {}
-        
-    def on_llm_end(self, response, **kwargs):
-        """Store token usage statistics when LLM response is complete."""
-        if hasattr(response, "usage"):
-            self.usage_stats = response.usage
 
 
 class LangchainLlmService(LlmService):
@@ -36,14 +26,12 @@ class LangchainLlmService(LlmService):
         if not api_key:
             raise ValueError("ANTHROPIC_API_KEY environment variable is not set")
 
-        self.token_usage_handler = TokenUsageCallbackHandler()
-        
         self.llm = ChatAnthropic(
             model="claude-3-7-sonnet-latest",
             anthropic_api_key=api_key,
             temperature=0.0,
             streaming=True,
-            callbacks=[StreamingStdOutCallbackHandler(), self.token_usage_handler],
+            callbacks=[StreamingStdOutCallbackHandler()],
             max_tokens=50000
         )
 
@@ -69,14 +57,13 @@ class LangchainLlmService(LlmService):
                 langchain_messages.append(AIMessage(content=message.content))
 
         # Generate response
-        response = self.llm.invoke(langchain_messages)
-        
+        with get_usage_metadata_callback() as cb:
+            response = self.llm.invoke(langchain_messages)
+
         # Print token usage statistics
-        if self.token_usage_handler.usage_stats:
+        if cb.usage_metadata:
             print("\n--- Token Usage Statistics ---")
-            print(f"Input tokens: {self.token_usage_handler.usage_stats.get('input_tokens', 'N/A')}")
-            print(f"Output tokens: {self.token_usage_handler.usage_stats.get('output_tokens', 'N/A')}")
-            print(f"Total tokens: {self.token_usage_handler.usage_stats.get('total_tokens', 'N/A')}")
+            print(json.dumps(cb.usage_metadata, indent=2))
             print("-----------------------------\n")
 
         # Convert Langchain response back to our domain Message object

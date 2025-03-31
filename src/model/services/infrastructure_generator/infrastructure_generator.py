@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List
 from src.model.command.command import Command
 from src.model.infra_requirement.infra_requirement import InfraRequirement
+from src.model.services.code_compression_service import CodeCompressionService
 from src.model.value_objects.domain_model_files import DomainModelFiles
 from src.model.value_objects.application_files import ApplicationFiles
 from src.model.services.llm_service import LlmService
@@ -17,14 +18,16 @@ class InfrastructureGenerator:
     Takes the Domain Model and generates the appropriate infrastructure implementation.                                                                    
     """
 
-    def __init__(self, llm_service: LlmService):
+    def __init__(self, llm_service: LlmService, code_compression_service: CodeCompressionService):
         """                                                                                                                                   
         Initialize the InfrastructureGenerator with a LLM service.                                                                       
 
         Args:                                                                                                                                 
             llm_service: The LLM service to use for generating the infrastructure.                                                      
+            code_compression_service: The service to compress code before sending to LLM.
         """
         self.llm_service = llm_service
+        self.code_compression_service = code_compression_service
         self.message_parser = MessageParser()
 
     def _load_prompt_from_file(self, filename: str) -> str:
@@ -64,8 +67,9 @@ class InfrastructureGenerator:
         requirements_text = "\n".join([req.requirement_text for req in requirements])
 
         # Prepare the domain model files text
+        compressed_domain_model = self.code_compression_service.remove_method_bodies(domain_model)
         domain_model_files = ""
-        for path, content in domain_model.files.items():
+        for path, content in compressed_domain_model.files.items():
             domain_model_files += f"\n{path}\nSOF```\n{content}\n```EOF\n"
 
         # Prepare the system prompt

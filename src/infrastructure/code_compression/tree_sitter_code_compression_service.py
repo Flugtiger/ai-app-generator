@@ -288,7 +288,7 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
             class_header += f"\n    {docstring}"
 
         return class_header
-        
+
     def remove_method_bodies(self, files: FilesDictionary) -> FilesDictionary:
         """
         Removes method bodies from the given FilesDictionary while keeping all other code intact.
@@ -310,45 +310,46 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
 
             # Parse the file
             tree = self.parser.parse(bytes(content, "utf8"))
-            
+
             # Process the file to remove method bodies
             processed_content = self._process_file_remove_method_bodies(content, tree.root_node)
-            
+
             result.add_file(path, processed_content)
 
         return result
-        
+
     def _process_file_remove_method_bodies(self, source_code: str, root_node) -> str:
         """
         Process a file to remove method bodies while keeping everything else intact.
-        
+
         Args:
             source_code: The original source code.
             root_node: The root node of the AST.
-            
+
         Returns:
             The processed source code with method bodies removed.
         """
         # Find all function definitions
         function_nodes = self._find_nodes_by_type(root_node, "function_definition")
-        
+
         # Sort nodes by their start position in reverse order to avoid offset issues
         function_nodes.sort(key=lambda node: node.start_byte, reverse=True)
-        
+
         # Make a mutable copy of the source code
         modified_code = source_code
-        
+
         for func_node in function_nodes:
             # Get the function signature and docstring
             signature, body_start, body_end, has_docstring = self._get_function_parts(modified_code, func_node)
-            
+
             if signature:
                 # Get proper indentation level
                 indent_level = self._get_indentation_level(modified_code, func_node)
                 # Add 4 more spaces for content inside the function
                 body_indent = ' ' * (indent_level + 4)
-                
+
                 # Prepare the replacement
+                replacement = "pass"
                 if has_docstring:
                     # Find the docstring node
                     block_node = None
@@ -356,7 +357,7 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
                         if child.type == "block":
                             block_node = child
                             break
-                    
+
                     if block_node and block_node.children:
                         first_stmt = block_node.children[0]
                         if first_stmt.type == "expression_statement":
@@ -365,30 +366,21 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
                                 # Keep the docstring and add 'pass' after it
                                 docstring = modified_code[string_node.start_byte:string_node.end_byte]
                                 # Remove the extra newline before docstring
-                                replacement = f"\n{body_indent}{docstring}\n{body_indent}pass"
-                            else:
-                                replacement = f"\n{body_indent}pass"
-                        else:
-                            replacement = f"\n{body_indent}pass"
-                    else:
-                        replacement = f"\n{body_indent}pass"
-                else:
-                    # No docstring, just add 'pass'
-                    replacement = f"\n{body_indent}pass"
-                
+                                replacement = f"{docstring}\n{body_indent}pass"
+
                 # Replace the body
                 modified_code = modified_code[:body_start] + replacement + modified_code[body_end:]
-        
+
         return modified_code
-    
+
     def _get_function_parts(self, source_code: str, func_node) -> Tuple[str, int, int, bool]:
         """
         Get the parts of a function: signature, body start position, body end position, and whether it has a docstring.
-        
+
         Args:
             source_code: The original source code.
             func_node: The function definition node.
-            
+
         Returns:
             A tuple containing the signature, body start position, body end position, and a boolean indicating if it has a docstring.
         """
@@ -398,13 +390,13 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
             if child.type == "block":
                 block_node = child
                 break
-                
+
         if not block_node:
             return None, 0, 0, False
-            
+
         # Get the function signature (everything before the block)
         signature = source_code[func_node.start_byte:block_node.start_byte].rstrip()
-        
+
         # Check for docstring
         has_docstring = False
         docstring_node = None
@@ -415,21 +407,21 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
                 if string_node:
                     has_docstring = True
                     docstring_node = string_node
-        
+
         # Get the body start and end positions
         body_start = block_node.start_byte
         body_end = block_node.end_byte
-        
+
         return signature, body_start, body_end, has_docstring
-    
+
     def _get_indentation_level(self, source_code: str, node) -> int:
         """
         Get the indentation level of a node.
-        
+
         Args:
             source_code: The original source code.
             node: The node to get the indentation level for.
-            
+
         Returns:
             The indentation level as a number of spaces.
         """
@@ -437,7 +429,7 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
         line_start = source_code.rfind('\n', 0, node.start_byte) + 1
         if line_start == 0:  # First line
             line_start = 0
-            
+
         # Count spaces/tabs at the beginning of the line
         indent = 0
         for i in range(line_start, node.start_byte):
@@ -447,5 +439,5 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
                 indent += 4  # Convert tabs to 4 spaces
             else:
                 break
-                
+
         return indent

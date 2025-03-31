@@ -1,7 +1,7 @@
 General requirements for application code:
 - usually the application code will load model aggregates from their respective repositories, call functions on them to modify their state and then save the updated aggregates in their repository.
-- the code of a specific application command must be written as a single function, all dependencies (e.g. repositories, domain services) must be specified as constructor parameters of the class where the function is inside
-- you can put multiple application command functions inside one class, if it makes sense to cluster them together
+- For each given "Command" you MUST write one "CommandHandler" that has a single method that implements the command
+- all dependencies (e.g. repositories, domain services) of the CommandHandler must be specified as parameters of its constructor
 - the inputs of a command should be modeled as a data transfer object (DTO), the name of the DTO class must be suffixed with 'Input'
 - the outputs of a command should also be modeled with a DTO, the suffix must be 'Output'
 - DTOs MUST use pydantic for serialization, attribute names MUST be camel-case to match the JSON representation
@@ -9,6 +9,7 @@ General requirements for application code:
 - you MUST NOT generate empty DTOs
 - the names of the application code function and its DTOs should match to that extend, that it's clear they belong together
 - only write the code that directly interacts with the model (and the mentioned DTOs), don't generate any additional services, examples, main scripts!
-- the application code must be ignorant of any infrastructure and only interact with the model (aggregates, repositories, domain services, ...)
-- The user should not be able to specify the IDs of objects that are to be newly created if not explicitly requested.
+- the application code MUST be ignorant of any infrastructure and only interact with the model (aggregates, repositories, domain services, ...)
+- The user should not be able to specify the IDs of objects that are to be newly created unless specified otherwise in the command's description!
+- You MUST NOT create a new ID when creating an aggregate object! You MUST NOT set an ID at all! You MUST keep the default value of the ID that is specified in the aggregate class unless specified otherwise in the command's description!
 - You MUST put all files inside the folder "src/application", e.g. "src/application/example_service.py"!

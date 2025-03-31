@@ -147,8 +147,8 @@ class CommandLineInterface:
         llm_service = LangchainLlmService()
         code_compression_service = TreeSitterCodeCompressionService()
         model_generator = ModelGenerator(llm_service)
-        application_services_generator = ApplicationServicesGenerator(llm_service)
-        infrastructure_generator = InfrastructureGenerator(llm_service)
+        application_services_generator = ApplicationServicesGenerator(llm_service, code_compression_service)
+        infrastructure_generator = InfrastructureGenerator(llm_service, code_compression_service)
         interface_generator = InterfaceGenerator(llm_service, code_compression_service)
 
         self.model_generator_commands = ModelGeneratorCommands(

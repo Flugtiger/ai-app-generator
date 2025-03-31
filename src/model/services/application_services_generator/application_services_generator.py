@@ -69,7 +69,7 @@ class ApplicationServicesGenerator:
 
         # Compress the domain model files by removing method bodies
         compressed_domain_model = self.code_compression_service.remove_method_bodies(domain_model)
-        
+
         # Prepare the compressed domain model files text
         domain_model_files = ""
         for path, content in compressed_domain_model.files.items():
@@ -90,7 +90,7 @@ class ApplicationServicesGenerator:
             philosophy])
 
         # Generate the application services using the LLM
-        # logger.warning("Gen App System prompt: %s", system_prompt)
+        logger.debug("Gen App System prompt:\n%s", system_prompt)
         messages = [
             Message(role="system", content=system_prompt),
             Message(role="user", content="Please generate application services based on the commands.")
@@ -135,7 +135,7 @@ class ApplicationServicesGenerator:
 
         # Compress the current application services files by removing method bodies
         compressed_services = self.code_compression_service.remove_method_bodies(current_services)
-        
+
         # Prepare the compressed application services files
         current_files = ""
         for path, content in compressed_services.files.items():
