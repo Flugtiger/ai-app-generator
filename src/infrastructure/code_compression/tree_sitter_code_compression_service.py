@@ -343,22 +343,37 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
             signature, body_start, body_end, has_docstring = self._get_function_parts(modified_code, func_node)
             
             if signature:
-                # Replace the function body with 'pass'
+                # Get proper indentation level
                 indent_level = self._get_indentation_level(modified_code, func_node)
-                indent = ' ' * indent_level
+                # Add 4 more spaces for content inside the function
+                body_indent = ' ' * (indent_level + 4)
                 
-                # Preserve the docstring if it exists
+                # Prepare the replacement
                 if has_docstring:
-                    # Keep the docstring and add 'pass' after it
-                    docstring_end = modified_code.find('\n', body_start)
-                    if docstring_end == -1:  # Single line docstring
-                        docstring_end = body_end - 1
+                    # Find the docstring node
+                    block_node = None
+                    for child in func_node.children:
+                        if child.type == "block":
+                            block_node = child
+                            break
                     
-                    # Replace everything after the docstring with 'pass'
-                    replacement = modified_code[body_start:docstring_end+1] + f"\n{indent}pass"
+                    if block_node and block_node.children:
+                        first_stmt = block_node.children[0]
+                        if first_stmt.type == "expression_statement":
+                            string_node = self._find_node_by_type(first_stmt, "string")
+                            if string_node:
+                                # Keep the docstring and add 'pass' after it
+                                docstring = modified_code[string_node.start_byte:string_node.end_byte]
+                                replacement = f"\n{body_indent}{docstring}\n{body_indent}pass"
+                            else:
+                                replacement = f"\n{body_indent}pass"
+                        else:
+                            replacement = f"\n{body_indent}pass"
+                    else:
+                        replacement = f"\n{body_indent}pass"
                 else:
                     # No docstring, just add 'pass'
-                    replacement = f"\n{indent}pass"
+                    replacement = f"\n{body_indent}pass"
                 
                 # Replace the body
                 modified_code = modified_code[:body_start] + replacement + modified_code[body_end:]
@@ -398,7 +413,11 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
                 if string_node:
                     has_docstring = True
         
-        return signature, block_node.start_byte, block_node.end_byte, has_docstring
+        # Get the body start and end positions
+        body_start = block_node.start_byte
+        body_end = block_node.end_byte
+        
+        return signature, body_start, body_end, has_docstring
     
     def _get_indentation_level(self, source_code: str, node) -> int:
         """
