@@ -1,3 +1,4 @@
+import logging
 import os
 from pathlib import Path
 from typing import List
@@ -7,6 +8,8 @@ from src.model.value_objects.application_files import ApplicationFiles
 from src.model.services.llm_service import LlmService
 from src.model.services.message_parser import MessageParser
 from src.model.value_objects.message import Message
+
+logger = logging.getLogger(__name__)
 
 
 class ApplicationServicesGenerator:
@@ -81,6 +84,7 @@ class ApplicationServicesGenerator:
             philosophy])
 
         # Generate the application services using the LLM
+        # logger.warning("Gen App System prompt: %s", system_prompt)
         messages = [
             Message(role="system", content=system_prompt),
             Message(role="user", content="Please generate application services based on the commands.")
