@@ -6,5 +6,6 @@ Follow the language's best practice for private methods.
 Make sure that files contain all imports, types etc.
 Make sure that code in different files are compatible with each other.
 Ensure to implement all code, if you are unsure, write a plausible implementation.
-Before you finish, double check that all parts of the architecture are present in the files.
+Before you finish, double check that all parts that have been requested from you are present in the files.
+Do not write parts that haven't been requested!
 Always add a comment briefly describing the purpose of the function definition.
