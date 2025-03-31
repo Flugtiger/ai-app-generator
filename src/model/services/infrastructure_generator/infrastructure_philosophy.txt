@@ -7,3 +7,4 @@ Always follow the best practices for the requested languages for folder/file str
 
 General rules for how to write infrastructure code:
 - you MUST implement all abstract classes and interfaces of the domain model
+- NEVER implement classes that are not abstract or that already have an implementation inside the domain model
