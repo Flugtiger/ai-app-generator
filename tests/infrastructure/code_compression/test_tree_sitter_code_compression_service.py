@@ -259,11 +259,11 @@ def function_with_docstring():
 
         result = self.service.remove_method_bodies(files)
         self.assertEqual(len(result.files), 1)
-        self.assertIn("def function_with_docstring():", result.files["test.py"])
-        self.assertIn('    """This is a docstring."""', result.files["test.py"])
-        self.assertIn("    pass", result.files["test.py"])
-        self.assertNotIn('print("Hello, world!")', result.files["test.py"])
-        self.assertNotIn("return 42", result.files["test.py"])
+        self.assertEqual("""
+def function_with_docstring():
+    \"\"\"This is a docstring.\"\"\"
+    pass
+""", result.files["test.py"])
 
     def test_remove_method_bodies_class_with_methods(self):
         """
@@ -286,21 +286,21 @@ class TestClass:
 
         result = self.service.remove_method_bodies(files)
         self.assertEqual(len(result.files), 1)
-        
+
         # Check that class definition and docstring are preserved
         self.assertIn('class TestClass:', result.files["test.py"])
         self.assertIn('    """A test class."""', result.files["test.py"])
-        
+
         # Check that constructor signature and docstring are preserved
         self.assertIn('    def __init__(self, param1, param2="default"):', result.files["test.py"])
         self.assertIn('        """Constructor for TestClass."""', result.files["test.py"])
-        
+
         # Check that method signature is preserved
         self.assertIn('    def method(self):', result.files["test.py"])
-        
+
         # Check that method bodies are replaced with pass
         self.assertIn('        pass', result.files["test.py"])
-        
+
         # Check that method body content is removed
         self.assertNotIn('self.param1 = param1', result.files["test.py"])
         self.assertNotIn('self.param2 = param2', result.files["test.py"])
@@ -325,21 +325,21 @@ class Class2:
 
         result = self.service.remove_method_bodies(files)
         self.assertEqual(len(result.files), 1)
-        
+
         # Check that all class definitions are preserved
         self.assertIn('class Class1:', result.files["test.py"])
         self.assertIn('class Class2:', result.files["test.py"])
-        
+
         # Check that all method signatures are preserved
         self.assertIn('    def method1(self):', result.files["test.py"])
         self.assertIn('    def method2(self):', result.files["test.py"])
-        
+
         # Check that docstring is preserved
         self.assertIn('        """Method 2 docstring."""', result.files["test.py"])
-        
+
         # Check that method bodies are replaced with pass
         self.assertIn('        pass', result.files["test.py"])
-        
+
         # Check that method body content is removed
         self.assertNotIn('return "Class1.method1"', result.files["test.py"])
         self.assertNotIn('return "Class2.method2"', result.files["test.py"])
@@ -363,16 +363,16 @@ def outer_function():
 
         result = self.service.remove_method_bodies(files)
         self.assertEqual(len(result.files), 1)
-        
+
         # Check that outer function signature is preserved
         self.assertIn('def outer_function():', result.files["test.py"])
-        
+
         # Check that inner function is removed (part of outer function body)
         self.assertNotIn('def inner_function():', result.files["test.py"])
-        
+
         # Check that outer function body is replaced with pass
         self.assertIn('    pass', result.files["test.py"])
-        
+
         # Check that all function body content is removed
         self.assertNotIn('print("Outer function")', result.files["test.py"])
         self.assertNotIn('print("Inner function")', result.files["test.py"])
