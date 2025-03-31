@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from src.model.services.code_compression_service import CodeCompressionService
 from src.model.value_objects.files_dictionary import FilesDictionary
@@ -288,3 +288,142 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
             class_header += f"\n    {docstring}"
 
         return class_header
+        
+    def remove_method_bodies(self, files: FilesDictionary) -> FilesDictionary:
+        """
+        Removes method bodies from the given FilesDictionary while keeping all other code intact.
+        Method signatures, docstrings, and class definitions remain unchanged.
+
+        Args:
+            files: A FilesDictionary with source code files.
+
+        Returns:
+            A FilesDictionary where method bodies are replaced with 'pass' statements
+        """
+        result = FilesDictionary()
+
+        for path, content in files.files.items():
+            # Only process Python files
+            if not path.endswith('.py'):
+                result.add_file(path, content)  # Keep non-Python files unchanged
+                continue
+
+            # Parse the file
+            tree = self.parser.parse(bytes(content, "utf8"))
+            
+            # Process the file to remove method bodies
+            processed_content = self._process_file_remove_method_bodies(content, tree.root_node)
+            
+            result.add_file(path, processed_content)
+
+        return result
+        
+    def _process_file_remove_method_bodies(self, source_code: str, root_node) -> str:
+        """
+        Process a file to remove method bodies while keeping everything else intact.
+        
+        Args:
+            source_code: The original source code.
+            root_node: The root node of the AST.
+            
+        Returns:
+            The processed source code with method bodies removed.
+        """
+        # Find all function definitions
+        function_nodes = self._find_nodes_by_type(root_node, "function_definition")
+        
+        # Sort nodes by their start position in reverse order to avoid offset issues
+        function_nodes.sort(key=lambda node: node.start_byte, reverse=True)
+        
+        # Make a mutable copy of the source code
+        modified_code = source_code
+        
+        for func_node in function_nodes:
+            # Get the function signature and docstring
+            signature, body_start, body_end, has_docstring = self._get_function_parts(modified_code, func_node)
+            
+            if signature:
+                # Replace the function body with 'pass'
+                indent_level = self._get_indentation_level(modified_code, func_node)
+                indent = ' ' * indent_level
+                
+                # Preserve the docstring if it exists
+                if has_docstring:
+                    # Keep the docstring and add 'pass' after it
+                    docstring_end = modified_code.find('\n', body_start)
+                    if docstring_end == -1:  # Single line docstring
+                        docstring_end = body_end - 1
+                    
+                    # Replace everything after the docstring with 'pass'
+                    replacement = modified_code[body_start:docstring_end+1] + f"\n{indent}pass"
+                else:
+                    # No docstring, just add 'pass'
+                    replacement = f"\n{indent}pass"
+                
+                # Replace the body
+                modified_code = modified_code[:body_start] + replacement + modified_code[body_end:]
+        
+        return modified_code
+    
+    def _get_function_parts(self, source_code: str, func_node) -> Tuple[str, int, int, bool]:
+        """
+        Get the parts of a function: signature, body start position, body end position, and whether it has a docstring.
+        
+        Args:
+            source_code: The original source code.
+            func_node: The function definition node.
+            
+        Returns:
+            A tuple containing the signature, body start position, body end position, and a boolean indicating if it has a docstring.
+        """
+        # Find the block node (function body)
+        block_node = None
+        for child in func_node.children:
+            if child.type == "block":
+                block_node = child
+                break
+                
+        if not block_node:
+            return None, 0, 0, False
+            
+        # Get the function signature (everything before the block)
+        signature = source_code[func_node.start_byte:block_node.start_byte].rstrip()
+        
+        # Check for docstring
+        has_docstring = False
+        if block_node.children and len(block_node.children) > 0:
+            first_stmt = block_node.children[0]
+            if first_stmt.type == "expression_statement":
+                string_node = self._find_node_by_type(first_stmt, "string")
+                if string_node:
+                    has_docstring = True
+        
+        return signature, block_node.start_byte, block_node.end_byte, has_docstring
+    
+    def _get_indentation_level(self, source_code: str, node) -> int:
+        """
+        Get the indentation level of a node.
+        
+        Args:
+            source_code: The original source code.
+            node: The node to get the indentation level for.
+            
+        Returns:
+            The indentation level as a number of spaces.
+        """
+        # Find the line start
+        line_start = source_code.rfind('\n', 0, node.start_byte) + 1
+        if line_start == 0:  # First line
+            line_start = 0
+            
+        # Count spaces/tabs at the beginning of the line
+        indent = 0
+        for i in range(line_start, node.start_byte):
+            if source_code[i] == ' ':
+                indent += 1
+            elif source_code[i] == '\t':
+                indent += 4  # Convert tabs to 4 spaces
+            else:
+                break
+                
+        return indent
