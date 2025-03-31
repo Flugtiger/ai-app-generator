@@ -8,6 +8,7 @@ from src.model.value_objects.application_files import ApplicationFiles
 from src.model.services.llm_service import LlmService
 from src.model.services.message_parser import MessageParser
 from src.model.value_objects.message import Message
+from src.model.services.code_compression_service import CodeCompressionService
 
 logger = logging.getLogger(__name__)
 
@@ -18,15 +19,17 @@ class ApplicationServicesGenerator:
     Takes Command entities and generates appropriate application services.                                                                    
     """
 
-    def __init__(self, llm_service: LlmService):
+    def __init__(self, llm_service: LlmService, code_compression_service: CodeCompressionService):
         """                                                                                                                                   
-        Initialize the ApplicationServicesGenerator with a LLM service.                                                                       
+        Initialize the ApplicationServicesGenerator with a LLM service and code compression service.                                                                       
 
         Args:                                                                                                                                 
-            llm_service: The LLM service to use for generating the application services.                                                      
+            llm_service: The LLM service to use for generating the application services.
+            code_compression_service: The service to compress code before sending to LLM.
         """
         self.llm_service = llm_service
         self.message_parser = MessageParser()
+        self.code_compression_service = code_compression_service
 
     def _load_prompt_from_file(self, filename: str) -> str:
         """
@@ -64,9 +67,12 @@ class ApplicationServicesGenerator:
         # Prepare the commands text
         commands_text = "\n".join([f"{cmd.id.value}: {cmd.name} - {cmd.description}" for cmd in commands])
 
-        # Prepare the domain model files text
+        # Compress the domain model files by removing method bodies
+        compressed_domain_model = self.code_compression_service.remove_method_bodies(domain_model)
+        
+        # Prepare the compressed domain model files text
         domain_model_files = ""
-        for path, content in domain_model.files.items():
+        for path, content in compressed_domain_model.files.items():
             domain_model_files += f"\n{path}\nSOF```\n{content}\n```EOF\n"
 
         # Prepare the system prompt
@@ -127,9 +133,12 @@ class ApplicationServicesGenerator:
         # Prepare the commands text
         commands_text = "\n".join([f"{cmd.id.value}: {cmd.name} - {cmd.description}" for cmd in commands])
 
-        # Prepare the current application services files
+        # Compress the current application services files by removing method bodies
+        compressed_services = self.code_compression_service.remove_method_bodies(current_services)
+        
+        # Prepare the compressed application services files
         current_files = ""
-        for path, content in current_services.files.items():
+        for path, content in compressed_services.files.items():
             current_files += f"\n{path}\nSOF```\n{content}\n```EOF\n"
 
         # Prepare the system prompt
