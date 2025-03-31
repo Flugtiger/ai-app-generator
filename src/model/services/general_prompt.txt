@@ -1,8 +1,10 @@
-Please note that the code should be fully functional. No placeholders.
-
-Follow a language and framework appropriate best practice file naming convention.
+Please note that the code should be fully functional. No placeholders!
+Always use the programming language the user asks for.
+Almost always put different classes in different files.
+Follow a language and framework appropriate best practice for folder/file structure and file naming convention.
 Follow the language's best practice for private methods.
 Make sure that files contain all imports, types etc.
 Make sure that code in different files are compatible with each other.
 Ensure to implement all code, if you are unsure, write a plausible implementation.
 Before you finish, double check that all parts of the architecture are present in the files.
+Always add a comment briefly describing the purpose of the function definition.

@@ -1,0 +1,3 @@
+{
+  "requirementText": "The `InterfaceFilesService` is a concrete `BaseFilesService`. It can read and write `InterfaceFiles` from/to the subfolder 'src/interface'."
+}

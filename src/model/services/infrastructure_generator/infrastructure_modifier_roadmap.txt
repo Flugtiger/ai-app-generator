@@ -1,3 +1,0 @@
-You will get a list files that make up a DDD model and requirements for how to write the infrastructure code for that model.
-You will also get the current infrastructure code that implements the abstract services and interfaces of the model.
-You will modify the current infrastructure code to match the given requirements.
