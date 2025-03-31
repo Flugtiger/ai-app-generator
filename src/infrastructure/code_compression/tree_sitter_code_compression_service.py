@@ -364,6 +364,7 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
                             if string_node:
                                 # Keep the docstring and add 'pass' after it
                                 docstring = modified_code[string_node.start_byte:string_node.end_byte]
+                                # Remove the extra newline before docstring
                                 replacement = f"\n{body_indent}{docstring}\n{body_indent}pass"
                             else:
                                 replacement = f"\n{body_indent}pass"
@@ -406,12 +407,14 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
         
         # Check for docstring
         has_docstring = False
+        docstring_node = None
         if block_node.children and len(block_node.children) > 0:
             first_stmt = block_node.children[0]
             if first_stmt.type == "expression_statement":
                 string_node = self._find_node_by_type(first_stmt, "string")
                 if string_node:
                     has_docstring = True
+                    docstring_node = string_node
         
         # Get the body start and end positions
         body_start = block_node.start_byte
