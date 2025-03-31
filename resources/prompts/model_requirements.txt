@@ -1,8 +1,9 @@
 General requirements for a clean DDD model that you MUST follow:
 - use pydantics `BaseModel` as the base for all classes that need to be serialized (e.g. aggregates)
 - use pydantic V2 syntax
-- IDs should have their own value object class
-- IDs of aggregates are set by the concrete repositories when an object is saved for the first time
+- IDs have their own value object class that wraps a simple string
+- IDs are initialized with a placeholder when a new aggregate object is instantiated
+- The real ID for new objects is generated and set in the infrastructure code. You MUST NOT implement this logic as part of the domain model!
 - aggregates must only reference other aggregates via the ID of the aggregate root
 - generate a Repository for each Aggregate
 - a Repository MUST be abstract (the implementation is not part of the model)
@@ -12,6 +13,5 @@ General requirements for a clean DDD model that you MUST follow:
 - use enums to restrict values
 - aggregates and value objects must not depend on or call domain services!
 - you MUST NOT write any infrastructure code, example code or anything else that should not be part of a technology-free domain model
-- you MUST NOT implement abstract domain services since their implementation will be part of the infrastructure code
-- Domain services that only use the languages base library to fulfill their tasks are considered 'technology-free', so go ahead and implement them.
+- you MUST NOT implement abstract(!) domain services since their implementation will be part of the infrastructure code
 - You MUST put all files inside the folder "src/model", e.g. "src/model/<aggregate_name>/aggregate_name.py" or "src/model/services/domain_service.py".

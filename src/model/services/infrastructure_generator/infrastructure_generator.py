@@ -70,7 +70,7 @@ class InfrastructureGenerator:
 
         # Prepare the system prompt
         roadmap = self._load_prompt_from_file("infrastructure_preamble.txt")
-        general_prompt = self._load_prompt_from_file("general_prompt.txt")
+        general_prompt = self._load_prompt_from_file("general.txt")
         philosophy = self._load_prompt_from_file("infrastructure_requirements.txt")
         system_prompt = "\n\n".join([
             roadmap,

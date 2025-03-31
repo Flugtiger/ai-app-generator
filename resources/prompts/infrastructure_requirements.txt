@@ -1,5 +1,6 @@
 General rules for how to write infrastructure code:
 - you MUST implement all abstract classes and interfaces of the domain model
 - NEVER implement classes that are not abstract or that already have an implementation inside the domain model
+- The repository implementations are responsible for generating and setting the IDs of new objects inside the `save` method.
 - You MUST NOT generate code for dependency resolution or dependency injection as this won't be part of the infrastructure layer
 - You MUST put all files inside the folder "src/infrastructure", e.g. "src/infrastructure/example_postgres_repository.py"!

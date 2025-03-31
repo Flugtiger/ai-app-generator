@@ -3,7 +3,7 @@ from typing import List, Optional
 from src.model.services.code_compression_service import CodeCompressionService
 from src.model.value_objects.files_dictionary import FilesDictionary
 
-from tree_sitter_languages import get_parser
+from tree_sitter_language_pack import get_parser
 
 
 class TreeSitterCodeCompressionService(CodeCompressionService):
@@ -102,7 +102,7 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
             if constructor:
                 # Get the constructor signature
                 constructor_sig = self._get_constructor_signature(source_code, constructor)
-                
+
                 # Preserve indentation for multi-line signatures
                 if '\n' in constructor_sig:
                     # Ensure proper indentation for multi-line signatures
@@ -197,24 +197,24 @@ class TreeSitterCodeCompressionService(CodeCompressionService):
         if parameters:
             # Find the colon that marks the end of the signature
             func_text = source_code[constructor_node.start_byte:constructor_node.end_byte]
-            
+
             # Find the block node that contains the function body
             block_node = self._find_node_by_type(constructor_node, "block")
             if block_node:
                 # Get just the signature part (everything before the block)
                 signature_text = source_code[constructor_node.start_byte:block_node.start_byte].strip()
-                
+
                 # Ensure it ends with a colon
                 if not signature_text.endswith(':'):
                     signature_text += ':'
-                    
+
                 return signature_text
-            
+
             # Fallback if we can't find the block
             colon_pos = func_text.find(':')
             if colon_pos != -1:
                 return func_text[:colon_pos + 1]
-                
+
             return func_text + ':'
 
         return "def __init__(self):"

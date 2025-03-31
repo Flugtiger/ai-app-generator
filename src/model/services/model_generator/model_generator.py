@@ -64,7 +64,7 @@ class ModelGenerator:
 
         # Load the system prompt from file and format it with requirements
         roadmap = self._load_prompt_from_file("model_preamble.txt")
-        general_prompt = self._load_prompt_from_file("general_prompt.txt")
+        general_prompt = self._load_prompt_from_file("general.txt")
         philosophy = self._load_prompt_from_file("model_requirements.txt")
         system_prompt = "\n\n".join([
             roadmap,

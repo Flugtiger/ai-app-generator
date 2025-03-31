@@ -2,6 +2,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+import traceback
 from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel, ValidationError
@@ -332,13 +333,16 @@ class CommandLineInterface:
                 print(f"Unknown command: {args.command}")
                 return 1
         except CliError as e:
-            print(f"Error: {str(e)}")
+            print(f"Error:")
+            print(traceback.format_exc())
             return 1
         except ValidationError as e:
-            print(f"Validation error: {str(e)}")
+            print(f"Validation error:")
+            print(traceback.format_exc())
             return 1
         except Exception as e:
-            print(f"Unexpected error: {str(e)}")
+            print("Unexpected error:")
+            print(traceback.format_exc())
             return 1
 
     def _handle_create_command(self, args) -> int:

@@ -1,4 +1,4 @@
 {
   "name": "createModelRequirement",
-  "description": "As a User I can create a Requirement for a DDD model"
+  "description": "As a User I can create a model requirement for a DDD model. The ID of the created model requirement is returned."
 }
