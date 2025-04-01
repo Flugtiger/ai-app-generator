@@ -76,20 +76,24 @@ class InfrastructureGenerator:
         roadmap = self._load_prompt_from_file("infrastructure_preamble.txt")
         general_prompt = self._load_prompt_from_file("general.txt")
         philosophy = self._load_prompt_from_file("infrastructure_requirements.txt")
+
         system_prompt = "\n\n".join([
             roadmap,
             general_prompt,
-            "The existing domain model:",
+            self.message_parser.get_file_template_with_example(),
+            philosophy])
+
+        user_prompt = "\n".join(
+            "The signatures of the existing domain model (method bodies removed intentionally):",
             domain_model_files,
             "The requirements:",
             requirements_text,
-            self.message_parser.get_file_template_with_example(),
-            philosophy])
+            "Please generate infrastructure code based on the model and the requirements.")
 
         # Generate the application services using the LLM
         messages = [
             Message(role="system", content=system_prompt),
-            Message(role="user", content="Please generate infrastructure code based on the model and the requirements.")
+            Message(role="user", content=user_prompt)
         ]
 
         response = self.llm_service.generate_response(messages)

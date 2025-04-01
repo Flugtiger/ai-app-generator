@@ -76,22 +76,26 @@ class InterfaceGenerator:
         roadmap = self._load_prompt_from_file("interface_preamble.txt")
         general_prompt = self._load_prompt_from_file("general.txt")
         philosophy = self._load_prompt_from_file("interface_requirements.txt")
+
         system_prompt = "\n\n".join([
             roadmap,
             general_prompt,
+            self.message_parser.get_file_template_with_example(),
+            philosophy])
+
+        user_prompt = "\n".join(
             "The existing application services:",
             app_services_files,
             "The constructor signatures of the domain model:",
             compressed_model_files,
             "The constructor signatures of the infrastructure code:",
             compressed_infra_files,
-            self.message_parser.get_file_template_with_example(),
-            philosophy])
+            "Please generate CLI interface code based on the application services.")
 
         # Generate the CLI interface using the LLM
         messages = [
             Message(role="system", content=system_prompt),
-            Message(role="user", content="Please generate CLI interface code based on the application services.")
+            Message(role="user", content=user_prompt)
         ]
 
         response = self.llm_service.generate_response(messages)

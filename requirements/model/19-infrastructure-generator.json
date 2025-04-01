@@ -1,3 +1,3 @@
 {
-  "requirementText": "The `InfrastructureGenerator` takes as input the `InfrastructureRequirement`s and the `DomainModelFiles` of the existing domain model and generates `InfrastructureFiles` by using a LLM. It does this by assembling a system prompt that is made up from a preamble, the general prompt, the `InfrastructureRequirement`s, the `DomainModelFiles`, the format of how to specify files and general requirements the infrastructure code must follow."
+  "requirementText": "The `InfrastructureGenerator` takes as input the `InfrastructureRequirement`s and the `DomainModelFiles` of the existing domain model and generates `InfrastructureFiles` by using a LLM. It does this by assembling a system prompt that is made up from a preamble, the general prompt, the format of how to specify files and general requirements the infrastructure code must follow. The user prompt consists of the `InfrastructureRequirement`s and the `DomainModelFiles`."
 }

@@ -79,21 +79,25 @@ class ApplicationServicesGenerator:
         roadmap = self._load_prompt_from_file("application_preamble.txt")
         general_prompt = self._load_prompt_from_file("general.txt")
         philosophy = self._load_prompt_from_file("application_requirements.txt")
+
         system_prompt = "\n\n".join([
             roadmap,
             general_prompt,
-            "The existing domain model:",
+            self.message_parser.get_file_template_with_example(),
+            philosophy])
+
+        user_prompt = "\n".join(
+            "The signatures of the existing domain model (method bodies removed intentionally):",
             domain_model_files,
             "The commands:",
             commands_text,
-            self.message_parser.get_file_template_with_example(),
-            philosophy])
+            "Please generate application services based on the commands.")
 
         # Generate the application services using the LLM
         logger.debug("Gen App System prompt:\n%s", system_prompt)
         messages = [
             Message(role="system", content=system_prompt),
-            Message(role="user", content="Please generate application services based on the commands.")
+            Message(role="user", content=user_prompt)
         ]
 
         response = self.llm_service.generate_response(messages)

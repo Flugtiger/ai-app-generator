@@ -69,15 +69,17 @@ class ModelGenerator:
         system_prompt = "\n\n".join([
             roadmap,
             general_prompt,
-            "The requirements:",
-            requirements_text,
             self.message_parser.get_file_template_with_example(),
             philosophy])
+        user_prompt = "\n".join(
+            "The requirements:",
+            requirements_text,
+            "Please generate a clean DDD model based on the requirements.")
 
         # Generate the model using the LLM
         messages = [
             Message(role="system", content=system_prompt),
-            Message(role="user", content="Please generate a clean DDD model based on the requirements.")
+            Message(role="user", content=user_prompt)
         ]
 
         response = self.llm_service.generate_response(messages)
