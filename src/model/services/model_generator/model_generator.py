@@ -66,15 +66,17 @@ class ModelGenerator:
         roadmap = self._load_prompt_from_file("model_preamble.txt")
         general_prompt = self._load_prompt_from_file("general.txt")
         philosophy = self._load_prompt_from_file("model_requirements.txt")
+
         system_prompt = "\n\n".join([
             roadmap,
             general_prompt,
             self.message_parser.get_file_template_with_example(),
             philosophy])
-        user_prompt = "\n".join(
+
+        user_prompt = "\n".join([
             "The requirements:",
             requirements_text,
-            "Please generate a clean DDD model based on the requirements.")
+            "Please generate a clean DDD model based on the requirements."])
 
         # Generate the model using the LLM
         messages = [

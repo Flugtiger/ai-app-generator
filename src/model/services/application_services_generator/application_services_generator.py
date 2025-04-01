@@ -86,12 +86,12 @@ class ApplicationServicesGenerator:
             self.message_parser.get_file_template_with_example(),
             philosophy])
 
-        user_prompt = "\n".join(
+        user_prompt = "\n".join([
             "The signatures of the existing domain model (method bodies removed intentionally):",
             domain_model_files,
             "The commands:",
             commands_text,
-            "Please generate application services based on the commands.")
+            "Please generate application services based on the commands."])
 
         # Generate the application services using the LLM
         logger.debug("Gen App System prompt:\n%s", system_prompt)

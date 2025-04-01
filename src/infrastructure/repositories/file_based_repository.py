@@ -116,6 +116,7 @@ class FileBasedRepository(Generic[T, ID], ABC):
                 # Skip files that can't be parsed
                 continue
 
+        entities.sort(key=lambda item: (len(str(self.get_id(item))), str(self.get_id(item))))
         return entities
 
     def delete(self, id: ID) -> None:

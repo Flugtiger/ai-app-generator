@@ -83,12 +83,12 @@ class InfrastructureGenerator:
             self.message_parser.get_file_template_with_example(),
             philosophy])
 
-        user_prompt = "\n".join(
+        user_prompt = "\n".join([
             "The signatures of the existing domain model (method bodies removed intentionally):",
             domain_model_files,
             "The requirements:",
             requirements_text,
-            "Please generate infrastructure code based on the model and the requirements.")
+            "Please generate infrastructure code based on the model and the requirements."])
 
         # Generate the application services using the LLM
         messages = [

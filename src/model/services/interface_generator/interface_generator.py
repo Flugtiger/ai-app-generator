@@ -83,14 +83,14 @@ class InterfaceGenerator:
             self.message_parser.get_file_template_with_example(),
             philosophy])
 
-        user_prompt = "\n".join(
+        user_prompt = "\n".join([
             "The existing application services:",
             app_services_files,
             "The constructor signatures of the domain model:",
             compressed_model_files,
             "The constructor signatures of the infrastructure code:",
             compressed_infra_files,
-            "Please generate CLI interface code based on the application services.")
+            "Please generate CLI interface code based on the application services."])
 
         # Generate the CLI interface using the LLM
         messages = [
