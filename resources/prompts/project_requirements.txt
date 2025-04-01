@@ -1,0 +1,3 @@
+When generating the project files:
+- follow the best practices of the language and framework for how to install and manage third party dependencies
+- write a README with a description of the software, a short usage guide and a short development guide

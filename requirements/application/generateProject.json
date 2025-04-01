@@ -1,0 +1,4 @@
+{
+  "name": "generateProject",
+  "description": "As a User I can generate the project files for the application. The files are written into the target directory (default: 'generated'). The command returns the number of generated files."
+}
