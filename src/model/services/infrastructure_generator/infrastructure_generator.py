@@ -67,9 +67,8 @@ class InfrastructureGenerator:
         requirements_text = "\n".join([req.requirement_text for req in requirements])
 
         # Prepare the domain model files text
-        compressed_domain_model = self.code_compression_service.remove_method_bodies(domain_model)
         domain_model_files = ""
-        for path, content in compressed_domain_model.files.items():
+        for path, content in domain_model.files.items():
             domain_model_files += f"\n{path}\nSOF```\n{content}\n```EOF\n"
 
         # Prepare the system prompt
