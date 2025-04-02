@@ -50,7 +50,7 @@ class CodeCompressorImpl(CodeCompressor):
             # Get class definition line
             class_def_line = class_lines[0]
             result.append(class_def_line)
-            
+
             # Extract class docstring if present
             class_docstring = self._extract_docstring(class_node, source_code)
             if class_docstring:
@@ -94,17 +94,17 @@ class CodeCompressorImpl(CodeCompressor):
                                 signature_lines.append(constructor_lines[i])
                                 break
                             signature_lines.append(constructor_lines[i])
-                
+
                 # Extract constructor docstring if present
                 constructor_docstring = self._extract_docstring(constructor_node, source_code)
-                
+
                 # Add constructor to result
                 result.extend(["    " + line for line in signature_lines])
-                
+
                 # Add docstring if present
                 if constructor_docstring:
                     result.append(f'        """{constructor_docstring}"""')
-                
+
                 # Add constructor body placeholder
                 result.append("        pass")
             else:
@@ -114,7 +114,7 @@ class CodeCompressorImpl(CodeCompressor):
             result.append('')
 
         return '\n'.join(result)
-    
+
     def _extract_docstring(self, node, source_code: str) -> Optional[str]:
         """
         Extract docstring from a node if present.
@@ -154,6 +154,7 @@ class CodeCompressorImpl(CodeCompressor):
                 # Only add the file if there's actual content after compression
                 if compressed_content.strip():
                     compressed_files.add_file(path, compressed_content)
-            # Non-Python files are excluded from the result
+            else:
+                compressed_files.add_file(path, content)
 
         return compressed_files
