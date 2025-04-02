@@ -50,6 +50,11 @@ class CodeCompressorImpl(CodeCompressor):
             # Get class definition line
             class_def_line = class_lines[0]
             result.append(class_def_line)
+            
+            # Extract class docstring if present
+            class_docstring = self._extract_docstring(class_node, source_code)
+            if class_docstring:
+                result.append(f'    """{class_docstring}"""')
 
             # Find constructor method
             constructor_node = None
@@ -89,12 +94,19 @@ class CodeCompressorImpl(CodeCompressor):
                                 signature_lines.append(constructor_lines[i])
                                 break
                             signature_lines.append(constructor_lines[i])
-
-                # Add constructor body placeholder
-                signature_lines.append("        pass")
-
+                
+                # Extract constructor docstring if present
+                constructor_docstring = self._extract_docstring(constructor_node, source_code)
+                
                 # Add constructor to result
                 result.extend(["    " + line for line in signature_lines])
+                
+                # Add docstring if present
+                if constructor_docstring:
+                    result.append(f'        """{constructor_docstring}"""')
+                
+                # Add constructor body placeholder
+                result.append("        pass")
             else:
                 result.append('    pass')
 
@@ -102,6 +114,22 @@ class CodeCompressorImpl(CodeCompressor):
             result.append('')
 
         return '\n'.join(result)
+    
+    def _extract_docstring(self, node, source_code: str) -> Optional[str]:
+        """
+        Extract docstring from a node if present.
+        """
+        for child in node.children:
+            if child.type == "block":
+                for block_child in child.children:
+                    if block_child.type == "expression_statement":
+                        expr_text = source_code[block_child.start_byte:block_child.end_byte].strip()
+                        # Check if this is a docstring (triple-quoted string)
+                        if (expr_text.startswith('"""') and expr_text.endswith('"""')) or \
+                           (expr_text.startswith("'''") and expr_text.endswith("'''")):
+                            # Remove the triple quotes
+                            return expr_text[3:-3].strip()
+        return None
 
     def _find_nodes_by_type(self, node, type_name: str, result: List):
         """
@@ -123,9 +151,9 @@ class CodeCompressorImpl(CodeCompressor):
         for path, content in files_dict.get_all_files().items():
             if path.endswith('.py'):
                 compressed_content = self._extract_class_declarations(content)
-                compressed_files.add_file(path, compressed_content)
-            else:
-                # For non-Python files, keep the original content
-                compressed_files.add_file(path, content)
+                # Only add the file if there's actual content after compression
+                if compressed_content.strip():
+                    compressed_files.add_file(path, compressed_content)
+            # Non-Python files are excluded from the result
 
         return compressed_files
