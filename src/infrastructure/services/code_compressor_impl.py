@@ -95,23 +95,8 @@ class CodeCompressorImpl(CodeCompressor):
 
                 # Add constructor to result
                 result.extend(["    " + line for line in signature_lines])
-
-            # Add class methods as stubs
-            for child in class_node.children:
-                if child.type == "block":
-                    function_nodes = []
-                    self._find_nodes_by_type(child, "function_definition", function_nodes)
-                    for func_node in function_nodes:
-                        func_text = source_code[func_node.start_byte:func_node.end_byte]
-                        func_lines = func_text.split('\n')
-
-                        # Skip constructor as it's already processed
-                        if "__init__" in func_lines[0]:
-                            continue
-
-                        # Add method signature and placeholder
-                        result.append("    " + func_lines[0])
-                        result.append("        pass")
+            else:
+                result.append('    pass')
 
             # Add a blank line after each class
             result.append('')
