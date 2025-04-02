@@ -96,6 +96,28 @@ Lastly, generate the project files:
 python -m src.interface.cli.main generate project
 ```
 
+You can also generate the complete application in one go:
+
+```bash
+python -m src.interface.cli.main generate all
+```
+
+### Generate the ai-app-generator recursively
+
+> [!WARNING]
+> Generating the ai-app-generator itself currently costs about 0,60$ (using claude-3-7-sonnet-latest)
+
+The ai-app-generator can generate itself from its own requirements. To do so, use the following workflow:
+
+```bash
+./ingest_model_reqs.sh
+./ingest_commands.sh
+./ingest_infra_reqs.sh
+python -m src.interface.cli.main generate all
+```
+
+Note: There is currently an incompatibility between the libraries 'tree-sitter' and 'tree-sitter-languages' that are used by Claude to implement the CodeCompressor service. To fix this, replace 'tree-sitter-languages' with 'tree-sitter-language-pack' in the generated app. Sadly, Claude doesn't know about this new library yet.
+
 ## Building and Development
 
 ### Prerequisites
