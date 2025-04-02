@@ -1,16 +1,26 @@
-from typing import List, Optional
-
-from src.model.value_objects.application_files import ApplicationFiles
+from src.model.files.application_files import ApplicationFiles
 from src.model.services.base_files_service import BaseFilesService
 
 
-class ApplicationFilesService(BaseFilesService[ApplicationFiles]):
+class ApplicationFilesService(BaseFilesService):
     """
-    Service for reading and writing ApplicationFiles objects from/to a file system.
+    Concrete BaseFilesService for reading and writing ApplicationFiles.
     """
-
+    
     def __init__(self):
         """
-        Initialize the service with application files configuration.
+        Initializes the service with the 'src/application' subfolder and ApplicationFiles class.
         """
-        super().__init__('application', ApplicationFiles)
+        super().__init__('src/application', ApplicationFiles)
+    
+    def read_files(self, project_root_path: str) -> ApplicationFiles:
+        """
+        Reads all files inside the 'src/application' subfolder into an ApplicationFiles object.
+        """
+        return super().read_files(project_root_path)
+    
+    def write_files(self, project_root_path: str, files_dict: ApplicationFiles) -> None:
+        """
+        Writes the files from the ApplicationFiles to the 'src/application' subfolder.
+        """
+        super().write_files(project_root_path, files_dict)

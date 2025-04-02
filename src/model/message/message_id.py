@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 
 
-class ModelRequirementId(BaseModel):
+class MessageId(BaseModel):
     """
-    Value object representing the unique identifier for a ModelRequirement.
+    Value object representing the unique identifier for a Message.
     """
     value: str
 

@@ -1,16 +1,26 @@
-from typing import List, Optional
-
-from src.model.value_objects.infrastructure_files import InfrastructureFiles
+from src.model.files.infrastructure_files import InfrastructureFiles
 from src.model.services.base_files_service import BaseFilesService
 
 
-class InfrastructureFilesService(BaseFilesService[InfrastructureFiles]):
+class InfrastructureFilesService(BaseFilesService):
     """
-    Service for reading and writing InfrastructureFiles objects from/to a file system.
+    Concrete BaseFilesService for reading and writing InfrastructureFiles.
     """
-
+    
     def __init__(self):
         """
-        Initialize the service with infrastructure files configuration.
+        Initializes the service with the 'src/infrastructure' subfolder and InfrastructureFiles class.
         """
-        super().__init__('infrastructure', InfrastructureFiles)
+        super().__init__('src/infrastructure', InfrastructureFiles)
+    
+    def read_files(self, project_root_path: str) -> InfrastructureFiles:
+        """
+        Reads all files inside the 'src/infrastructure' subfolder into an InfrastructureFiles object.
+        """
+        return super().read_files(project_root_path)
+    
+    def write_files(self, project_root_path: str, files_dict: InfrastructureFiles) -> None:
+        """
+        Writes the files from the InfrastructureFiles to the 'src/infrastructure' subfolder.
+        """
+        super().write_files(project_root_path, files_dict)
