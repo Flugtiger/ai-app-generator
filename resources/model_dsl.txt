@@ -1,0 +1,139 @@
+
+# Value Objects
+value_object Message {}
+
+value_object CommandId {}
+
+value_object ModelRequirementId {}
+
+value_object InfrastructureRequirementId {}
+
+value_object FilesDictionary {}
+
+value_object DomainModelFiles extends FilesDictionary {}
+
+value_object ApplicationFiles extends FilesDictionary {}
+
+value_object InfrastructureFiles extends FilesDictionary {}
+
+value_object InterfaceFiles extends FilesDictionary {}
+
+# Aggregates
+aggregate Command {
+  depends_on {
+    value_object CommandId
+  }
+}
+
+aggregate ModelRequirement {
+  depends_on {
+    value_object ModelRequirementId
+  }
+}
+
+aggregate InfrastructureRequirement {
+  depends_on {
+    value_object InfrastructureRequirementId
+  }
+}
+
+# Domain Services
+interface LLMService {
+  depends_on {
+    value_object Message
+  }
+}
+
+interface MessageParser {
+  depends_on {
+    value_object Message,
+    value_object FilesDictionary
+  }
+}
+
+interface CodeCompressor {
+  depends_on {
+    value_object FilesDictionary
+  }
+}
+
+abstract service BaseFilesService {
+  depends_on {
+    value_object FilesDictionary
+  }
+}
+
+service DomainModelFilesService extends BaseFilesService {
+  depends_on {
+    value_object DomainModelFiles
+  }
+}
+
+service ApplicationFilesService extends BaseFilesService {
+  depends_on {
+    value_object ApplicationFiles
+  }
+}
+
+service InfrastructureFilesService extends BaseFilesService {
+  depends_on {
+    value_object InfrastructureFiles
+  }
+}
+
+service InterfaceFilesService extends BaseFilesService {
+  depends_on {
+    value_object InterfaceFiles
+  }
+}
+
+service DomainModelGenerator {
+  depends_on {
+    interface LLMService,
+    interface MessageParser,
+    aggregate ModelRequirement,
+    value_object DomainModelFiles
+  }
+}
+
+service ApplicationGenerator {
+  depends_on {
+    interface LLMService,
+    interface MessageParser,
+    aggregate Command,
+    value_object DomainModelFiles,
+    value_object ApplicationFiles
+  }
+}
+
+service InfrastructureGenerator {
+  depends_on {
+    interface LLMService,
+    interface MessageParser,
+    aggregate InfrastructureRequirement,
+    value_object DomainModelFiles,
+    value_object InfrastructureFiles
+  }
+}
+
+service InterfaceGenerator {
+  depends_on {
+    interface LLMService,
+    interface MessageParser,
+    interface CodeCompressor,
+    value_object ApplicationFiles,
+    value_object DomainModelFiles,
+    value_object InfrastructureFiles,
+    value_object InterfaceFiles
+  }
+}
+
+service ProjectGenerator {
+  depends_on {
+    interface LLMService,
+    interface MessageParser,
+    value_object InfrastructureFiles,
+    value_object InterfaceFiles,
+    value_object FilesDictionary
+  }
+}
