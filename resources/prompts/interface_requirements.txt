@@ -14,6 +14,7 @@ When designing a CLI interface, follow these principles:
 - Handle errors gracefully
 - Validate input before processing
 - Provide clear feedback on success or failure
+- Catch all non-recoverable errors and exceptions only at the entrypoint and print stack traces before the application crashes
 
 ## Documentation
 - Include help text for all commands and options
@@ -21,7 +22,7 @@ When designing a CLI interface, follow these principles:
 - Document expected input and output formats
 
 ## Implementation Details
-- Use argparse for command-line parsing
+- Use a proper library for command-line parsing
 - Follow a consistent pattern for command implementation
 - Separate concerns: parsing, validation, execution, and output formatting
 - The CLI interface MUST be implemented in the src/interface directory.
