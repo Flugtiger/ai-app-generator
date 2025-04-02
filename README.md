@@ -40,59 +40,35 @@ cd ai-app-generator
 pip install -e .
 ```
 
-### Creating Model Requirements
+### Creating Requirements
 
-Create a model requirement using the CLI:
+Create a model requirement:
 
 ```bash
 python -m src.interface.cli.main model-requirement create --text "A model requirement"
 ```
 
-### Creating Commands
-
-Create a command using the CLI:
+Create a command:
 
 ```bash
 python -m src.interface.cli.main command create --name MyFirstCommand --description "A command description"
 ```
 
-### Creating Infrastructure Requirements
-
-Create am infrastructure requirement using the CLI:
+Create an infrastructure requirement:
 
 ```bash
 python -m src.interface.cli.main infrastructure-requirement create --text "An infra requirement"
 ```
 
-### Generating the Application Layers
+### Generating an Application
 
-First, generate a domain model from all model requirements:
+You can generate the layers of an application one by one (in the correct order: application and infrastructure depend on the model; the interface depends on application, model and infrastructure; the project files depend on the interface and infrastructure layers):
 
 ```bash
 python -m src.interface.cli.main generate model
-```
-
-Then, generate the application layer based on commands and the domain model:
-
-```bash
 python -m src.interface.cli.main generate application
-```
-
-Then, generate the infrastructure layer based on the domain model and the infrastructure requirements:
-
-```bash
 python -m src.interface.cli.main generate infrastructure
-```
-
-Then, generate the CLI for the application:
-
-```bash
 python -m src.interface.cli.main generate interface
-```
-
-Lastly, generate the project files:
-
-```bash
 python -m src.interface.cli.main generate project
 ```
 
@@ -165,7 +141,7 @@ pytest
 - `src/model`: Contains the domain model
 - `src/infrastructure`: Contains infrastructure implementations
 - `src/interface`: Command-line interface
-- `requirements`: Sample requirements and commands
+- `requirements`: Requirements for the ai-app-generator itself
 
 ## Contributing
 
