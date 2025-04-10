@@ -31,9 +31,11 @@ def generate_group():
 
 @generate_group.command(name="model")
 @click.option("--target-dir", "-t", default="generated", help="The directory where the generated files will be written")
-def generate_model(target_dir: str):
+@click.option("--use-all", "-a", is_flag=True, help="Use all requirements regardless of implementation status")
+def generate_model(target_dir: str, use_all: bool):
     """
     Generate domain model code from requirements.
+    By default, only uses unimplemented requirements unless --use-all flag is provided.
     """
     # Get dependencies
     model_requirement_repository = get_model_requirement_repository()
@@ -49,7 +51,8 @@ def generate_model(target_dir: str):
     
     # Create input DTO
     input_dto = GenerateModelInput(
-        targetDirectory=target_dir
+        targetDirectory=target_dir,
+        useAllRequirements=use_all
     )
     
     # Execute handler
@@ -189,12 +192,13 @@ def generate_project(target_dir: str):
 
 @generate_group.command(name="all")
 @click.option("--target-dir", "-t", default="generated", help="The directory where the generated files will be written")
-def generate_all(target_dir: str):
+@click.option("--use-all", "-a", is_flag=True, help="Use all requirements regardless of implementation status")
+def generate_all(target_dir: str, use_all: bool):
     """
     Generate all code (model, application, infrastructure, interface, project).
     """
     # Generate each layer in sequence
-    generate_model.callback(target_dir)
+    generate_model.callback(target_dir, use_all)
     generate_application.callback(target_dir)
     generate_infrastructure.callback(target_dir)
     generate_interface.callback(target_dir)

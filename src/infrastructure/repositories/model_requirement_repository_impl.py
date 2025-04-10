@@ -39,3 +39,10 @@ class ModelRequirementRepositoryImpl(ModelRequirementRepository):
         Retrieves all ModelRequirements from the repository.
         """
         return self.repository.get_all()
+        
+    def get_unimplemented(self) -> List[ModelRequirement]:
+        """
+        Retrieves all unimplemented ModelRequirements from the repository.
+        """
+        all_requirements = self.get_all()
+        return [req for req in all_requirements if not req.implemented]

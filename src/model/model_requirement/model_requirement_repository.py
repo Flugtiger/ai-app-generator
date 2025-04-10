@@ -29,3 +29,10 @@ class ModelRequirementRepository(ABC):
         Retrieves all ModelRequirements from the repository.
         """
         pass
+        
+    @abstractmethod
+    def get_unimplemented(self) -> List[ModelRequirement]:
+        """
+        Retrieves all unimplemented ModelRequirements from the repository.
+        """
+        pass
