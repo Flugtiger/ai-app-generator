@@ -99,7 +99,7 @@ class DomainModelGenerator:
         response_message = self.llm_service.generate_response(messages)
 
         # Parse files from response
-        files_dict = self.message_parser.apply_edits_from_message(response_message, domain_model_files)
+        files_dict = self.message_parser.apply_edits_from_message(response_message, existing_domain_model)
 
         # Convert to DomainModelFiles
         domain_model_files = DomainModelFiles()
