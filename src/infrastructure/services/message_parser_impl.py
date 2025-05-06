@@ -1,5 +1,5 @@
 import re
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 from src.model.files.files_dictionary import FilesDictionary
 from src.model.message.message import Message
@@ -37,6 +37,48 @@ class MessageParserImpl(MessageParser):
             f"{self.start_token}\n"
             f"print(\"Hello World\")\n"
             f"{self.end_token}"
+        )
+        return pattern
+    
+    def get_edit_format_pattern(self) -> str:
+        """
+        Returns a pattern for how to define file edits, including an example, for use in system prompts.
+        """
+        pattern = (
+            f"To edit existing files or create new ones, use the SEARCH/REPLACE format:\n\n"
+            f"FILEPATH\n"
+            f"```LANGUAGE\n"
+            f"<<<<<<< SEARCH\n"
+            f"EXISTING_CODE_TO_REPLACE\n"
+            f"=======\n"
+            f"NEW_CODE\n"
+            f">>>>>>> REPLACE\n"
+            f"```\n\n"
+            f"The following tokens must be replaced like so:\n"
+            f"- FILEPATH is the full path to the file\n"
+            f"- LANGUAGE is the programming language (e.g., python, java, etc.)\n"
+            f"- EXISTING_CODE_TO_REPLACE is the exact code to be replaced (leave empty for new files)\n"
+            f"- NEW_CODE is the code that will replace the search block\n\n"
+            f"Example for editing an existing file:\n\n"
+            f"src/example.py\n"
+            f"```python\n"
+            f"<<<<<<< SEARCH\n"
+            f"def hello():\n"
+            f"    print(\"Hello\")\n"
+            f"=======\n"
+            f"def hello():\n"
+            f"    print(\"Hello, World!\")\n"
+            f">>>>>>> REPLACE\n"
+            f"```\n\n"
+            f"Example for creating a new file:\n\n"
+            f"src/new_file.py\n"
+            f"```python\n"
+            f"<<<<<<< SEARCH\n"
+            f"=======\n"
+            f"def new_function():\n"
+            f"    print(\"This is a new file\")\n"
+            f">>>>>>> REPLACE\n"
+            f"```"
         )
         return pattern
     
@@ -84,6 +126,20 @@ class MessageParserImpl(MessageParser):
         
         return files
     
+    def _extract_search_replace_blocks(self, content: str) -> List[Tuple[str, str, str]]:
+        """
+        Extract search/replace blocks from the content.
+        Returns a list of tuples (filepath, search_block, replace_block).
+        """
+        pattern = r'([^\n]+)\n```[^\n]*\n<<<<<<< SEARCH\n(.*?)\n=======\n(.*?)\n>>>>>>> REPLACE\n```'
+        matches = re.findall(pattern, content, re.DOTALL)
+        
+        result = []
+        for filepath, search_block, replace_block in matches:
+            result.append((filepath.strip(), search_block, replace_block))
+        
+        return result
+    
     def parse_files_from_message(self, message: Message) -> FilesDictionary:
         """
         Parses a LLM response message and returns a FilesDictionary with the parsed files.
@@ -99,3 +155,39 @@ class MessageParserImpl(MessageParser):
             return files_dict
         except Exception as e:
             raise ValueError(f"Failed to parse message: {str(e)}")
+    
+    def apply_edits_from_message(self, message: Message, files_dict: FilesDictionary) -> FilesDictionary:
+        """
+        Parses a LLM response message for file edits and applies them to the provided FilesDictionary.
+        Returns the updated FilesDictionary.
+        """
+        try:
+            # Create a copy of the files dictionary to avoid modifying the original
+            updated_files_dict = FilesDictionary(files=files_dict.get_all_files().copy())
+            
+            # Extract search/replace blocks
+            edits = self._extract_search_replace_blocks(message.content)
+            
+            for filepath, search_block, replace_block in edits:
+                # For new files (empty search block)
+                if not search_block.strip():
+                    updated_files_dict.add_file(filepath, replace_block)
+                    continue
+                
+                # For existing files
+                existing_content = updated_files_dict.get_file(filepath)
+                
+                # If file doesn't exist in the dictionary but has a search block, raise an error
+                if existing_content is None:
+                    raise ValueError(f"Cannot edit non-existent file: {filepath}")
+                
+                # Replace the search block with the replace block
+                if search_block in existing_content:
+                    new_content = existing_content.replace(search_block, replace_block)
+                    updated_files_dict.add_file(filepath, new_content)
+                else:
+                    raise ValueError(f"Search block not found in file: {filepath}")
+            
+            return updated_files_dict
+        except Exception as e:
+            raise ValueError(f"Failed to apply edits from message: {str(e)}")

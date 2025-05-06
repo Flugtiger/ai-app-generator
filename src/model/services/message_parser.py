@@ -22,3 +22,18 @@ class MessageParser(ABC):
         Parses a LLM response message and returns a FilesDictionary with the parsed files.
         """
         pass
+    
+    @abstractmethod
+    def get_edit_format_pattern(self) -> str:
+        """
+        Returns a pattern for how to define file edits, including an example, for use in system prompts.
+        """
+        pass
+    
+    @abstractmethod
+    def apply_edits_from_message(self, message: Message, files_dict: FilesDictionary) -> FilesDictionary:
+        """
+        Parses a LLM response message for file edits and applies them to the provided FilesDictionary.
+        Returns the updated FilesDictionary.
+        """
+        pass
