@@ -9,6 +9,8 @@ General requirements for a clean DDD model that you MUST follow:
 - a Repository MUST be abstract (the implementation is not part of the model)
 - a Repository MUST have at least the methods `get_by_id`, `save` and `get_all`
 - if an object is to be created from an existing object, put a factory method in the class of the existing object, e.g. if a House is needed to create an Apartment, it should be possible to write: house.create_apartment(...), this factory method should call the constructor of the class of the object to be created, not another wrapper!
+- you MUST NOT generate arbitrary getters, setters or modification methods, if not absolutely necessary to fulfill the requirements or not explicitly mentioned
+- if there is a value object for a specific type of data, use it everywhere that data type is needed (method parameters, class fields, return types)
 - make assertions about the model state before the actual code in the model methods
 - use enums to restrict values
 - aggregates and value objects must not depend on or call domain services!

@@ -13,7 +13,8 @@ class ImplementModelRequirementInput(BaseModel):
     Input DTO for implementing a single model requirement
     """
     requirementId: str = Field(..., description="The ID of the requirement to implement")
-    targetDirectory: Optional[str] = Field("generated", description="The directory where the generated files will be written")
+    targetDirectory: Optional[str] = Field(
+        "generated", description="The directory where the generated files will be written")
 
 
 class ImplementModelRequirementOutput(BaseModel):
@@ -28,9 +29,9 @@ class ImplementModelRequirementHandler:
     """
     Handler for implementing a single model requirement in the existing domain model
     """
-    
+
     def __init__(
-        self, 
+        self,
         model_requirement_repository: ModelRequirementRepository,
         domain_model_generator: DomainModelGenerator,
         domain_model_files_service: DomainModelFilesService
@@ -41,7 +42,7 @@ class ImplementModelRequirementHandler:
         self.model_requirement_repository = model_requirement_repository
         self.domain_model_generator = domain_model_generator
         self.domain_model_files_service = domain_model_files_service
-    
+
     def handle(self, input_dto: ImplementModelRequirementInput) -> ImplementModelRequirementOutput:
         """
         Implements a single model requirement in the existing domain model.
@@ -51,20 +52,20 @@ class ImplementModelRequirementHandler:
         # Get the requirement from the repository
         requirement_id = ModelRequirementId(value=input_dto.requirementId)
         requirement = self.model_requirement_repository.get_by_id(requirement_id)
-        
+
         # Read existing domain model files
         existing_domain_model = self.domain_model_files_service.read_files(input_dto.targetDirectory)
-        
+
         # Implement the requirement in the domain model
         updated_domain_model = self.domain_model_generator.implement(requirement, existing_domain_model)
-        
+
         # Write the updated domain model files
         self.domain_model_files_service.write_files(input_dto.targetDirectory, updated_domain_model)
-        
+
         # Mark the requirement as implemented
-        requirement.implement()
+        requirement.implement(list(updated_domain_model.get_all_files().keys()))
         self.model_requirement_repository.save(requirement)
-        
+
         # Return the number of modified files
         return ImplementModelRequirementOutput(
             numberOfFiles=len(updated_domain_model.get_all_files()),
