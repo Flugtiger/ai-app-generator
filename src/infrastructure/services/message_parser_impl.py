@@ -131,7 +131,7 @@ class MessageParserImpl(MessageParser):
         Extract search/replace blocks from the content.
         Returns a list of tuples (filepath, search_block, replace_block).
         """
-        pattern = r'([^\n]+)\n```[^\n]*\n<<<<<<< SEARCH\n(.*?)\n=======\n(.*?)\n>>>>>>> REPLACE\n```'
+        pattern = r'([^\n]+)\n```[^\n]*\n<<<<<<< SEARCH\n(.*?)=======\n(.*?)>>>>>>> REPLACE\n```'
         matches = re.findall(pattern, content, re.DOTALL)
 
         result = []
