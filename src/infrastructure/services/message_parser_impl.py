@@ -136,7 +136,7 @@ class MessageParserImpl(MessageParser):
 
         result = []
         for filepath, search_block, replace_block in matches:
-            result.append((filepath.strip(), search_block, replace_block))
+            result.append((filepath.strip(), search_block.strip(), replace_block.strip()))
 
         return result
 
@@ -171,7 +171,7 @@ class MessageParserImpl(MessageParser):
             for filepath, search_block, replace_block in edits:
                 # For new files (empty search block)
                 if not search_block.strip():
-                    updated_files_dict.add_file(filepath, replace_block)
+                    updated_files_dict.add_file(filepath, replace_block + "\n")
                     continue
 
                 # For existing files
@@ -183,6 +183,7 @@ class MessageParserImpl(MessageParser):
 
                 # Replace the search block with the replace block
                 if search_block in existing_content:
+                    # this should keep the trailing newline in place:
                     new_content = existing_content.replace(search_block, replace_block)
                     updated_files_dict.add_file(filepath, new_content)
                 else:

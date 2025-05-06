@@ -8,8 +8,8 @@
       "name": "Python Debugger: Module",
       "type": "debugpy",
       "request": "launch",
-      "module": "src.infrastructure.cli",
-      "args": ["generate-infrastructure"]
+      "module": "src.interface.cli.main",
+      "args": ["model-requirement", "implement", "--id", "MR-25"]
     }
   ]
 }

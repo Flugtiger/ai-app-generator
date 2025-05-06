@@ -1,0 +1,3 @@
+{
+  "requirementText": "A `ModelRequirement` can be implemented. A list of paths of files in the code base must be provided which denotes the code files in which the requirement is implemented. These paths are saved on the implemented requirement."
+}
