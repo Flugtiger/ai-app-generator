@@ -1,0 +1,3 @@
+{
+  "requirementText": "The `MessageParser` also declares two additional methods for getting the format/syntax of how to edit files and for parsing coresponding edit data from the `Message` of a LLM."
+}

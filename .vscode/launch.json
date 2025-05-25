@@ -9,7 +9,7 @@
       "type": "debugpy",
       "request": "launch",
       "module": "src.interface.cli.main",
-      "args": ["model-requirement", "implement", "--id", "MR-25"]
+      "args": ["model-requirement", "create", "--text", "\"MR-25\""]
     }
   ]
 }

@@ -1,0 +1,4 @@
+{
+  "name": "implementModelRequirement",
+  "description": "As a User I can implement a single model requirement by specifying its ID. The generated model files are written into the target directory (default: 'generated'). The command returns the number of generated files."
+}

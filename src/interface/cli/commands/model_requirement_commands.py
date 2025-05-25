@@ -25,18 +25,18 @@ def create_model_requirement(text: str):
     """
     # Get dependencies
     model_requirement_repository = get_model_requirement_repository()
-    
+
     # Create handler
     handler = CreateModelRequirementHandler(model_requirement_repository)
-    
+
     # Create input DTO
     input_dto = CreateModelRequirementInput(
         requirementText=text
     )
-    
+
     # Execute handler
     result = handler.handle(input_dto)
-    
+
     # Output result
     click.echo(f"Model requirement created successfully with ID: {result.modelRequirementId}")
 
@@ -52,23 +52,23 @@ def implement_model_requirement(id: str, target_dir: str):
     model_requirement_repository = get_model_requirement_repository()
     domain_model_generator = get_domain_model_generator()
     domain_model_files_service = get_domain_model_files_service()
-    
+
     # Create handler
     handler = ImplementModelRequirementHandler(
         model_requirement_repository,
         domain_model_generator,
         domain_model_files_service
     )
-    
+
     # Create input DTO
     input_dto = ImplementModelRequirementInput(
         requirementId=id,
         targetDirectory=target_dir
     )
-    
+
     # Execute handler
     result = handler.handle(input_dto)
-    
+
     # Output result
     click.echo(f"Model requirement {result.requirementId} implemented successfully.")
     click.echo(f"Number of files affected: {result.numberOfFiles}")

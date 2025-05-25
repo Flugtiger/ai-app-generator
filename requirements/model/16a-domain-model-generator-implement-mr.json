@@ -1,0 +1,3 @@
+{
+  "requirementText": "The Domain Model Generator can also implement a single `ModelRequirement`. This is done by assembling a system prompt that consists of the preamble for incremental model generation, the general prompt, the syntax for how to edit files and general requirements for the domain model. The user prompt consists of the existing domain model files and the requirement that needs to be added."
+}

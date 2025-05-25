@@ -1,0 +1,3 @@
+{
+  "requirementText": "The implementation of the `MessageParser` also defines the syntax for making edits to files. This syntax is similiar to the syntax of writing whole files with the difference that it contains a SEARCH block and a REPLACE block so the LLM can define which lines in a file to replace with new content. The method that parses this syntax from a LLM `Message` follows the same patterns as the method for parsing whole files."
+}
