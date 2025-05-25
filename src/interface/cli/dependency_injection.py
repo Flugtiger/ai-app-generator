@@ -2,6 +2,7 @@
 Module for dependency injection in the CLI interface.
 Provides factory functions for all required dependencies.
 """
+import time
 from src.model.command.command_repository import CommandRepository
 from src.model.model_requirement.model_requirement_repository import ModelRequirementRepository
 from src.model.infrastructure_requirement.infrastructure_requirement_repository import InfrastructureRequirementRepository
