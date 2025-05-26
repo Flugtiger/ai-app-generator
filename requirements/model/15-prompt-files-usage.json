@@ -1,3 +1,0 @@
-{
-  "requirementText": "For all 'Generator' services: The generator-specific preamble, the general prompt and the generator-specific requirements are loaded statically from the resource files within the Generator service. Implement the resource loading in the generators by directly reading the files from file system."
-}
