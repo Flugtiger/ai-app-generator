@@ -1,0 +1,3 @@
+{
+  "requirementText": "An `EditData` value object can be applied to a `FilesDictionary` to get a new `FilesDictionary` object containing only those files that have been edited or added."
+}
