@@ -1,8 +1,7 @@
-import os
 import re
 from typing import List
 
-from model.model_requirement.model_requirement_id import ModelRequirementId
+from src.model.model_requirement.model_requirement_id import ModelRequirementId
 from src.model.files.domain_model_files import DomainModelFiles
 from src.model.message.message import Message, MessageRole
 from src.model.model_requirement.model_requirement import ModelRequirement
@@ -131,30 +130,25 @@ class DomainModelGenerator:
     def _get_file_paths_for_implemented_requirement(self, requirement: ModelRequirement, msg: Message) -> List[str]:
         """
         Extracts the file paths where a requirement is implemented from the message content.
-        
+
         Args:
             requirement: The requirement to look for
             msg: The message to parse
-            
+
         Returns:
             A list of file paths where the requirement is implemented
         """
         req_id_str = str(requirement.id)
         file_paths = []
-        
+
         # Look for patterns like "Requirement REQ001 is implemented in:" followed by a list
         pattern = rf"Requirement\s+{re.escape(req_id_str)}\s+is\s+implemented\s+in:\s*(?:\n\s*-\s*([^\n]+))+?"
         match = re.search(pattern, msg.content, re.IGNORECASE)
-        
+
         if match:
             # Extract all file paths from the list
             list_pattern = rf"Requirement\s+{re.escape(req_id_str)}\s+is\s+implemented\s+in:(?:\s*\n\s*-\s*([^\n]+))+"
             file_matches = re.findall(r"-\s*([^\n]+)", msg.content[match.start():])
             file_paths.extend([path.strip() for path in file_matches])
-        
-        # Also look for alternative formats like "File X implements requirement REQ001"
-        alt_pattern = rf"(?:file|File)\s+([^\s]+)\s+implements\s+requirements?\s+(?:.*?{re.escape(req_id_str)})"
-        alt_matches = re.findall(alt_pattern, msg.content, re.IGNORECASE)
-        file_paths.extend([path.strip() for path in alt_matches])
-        
+
         return file_paths
