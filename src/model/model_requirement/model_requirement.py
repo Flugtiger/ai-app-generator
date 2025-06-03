@@ -21,14 +21,13 @@ class ModelRequirement(BaseModel):
     """
     id: Optional[ModelRequirementId] = None
     requirement_text: str = Field(..., description="The text describing the requirement")
-    implemented: bool = Field(default=False, description="Flag indicating if the requirement has been implemented")
     implementation_file_paths: List[str] = Field(default_factory=list)
     implemented_requirement_text: Optional[str] = Field(default=None, description="The requirement text that was implemented")
 
     def implement(self, file_paths: List[str]) -> None:
         """
-        Marks the requirement as implemented by setting the implemented flag to true
-        and storing the file paths where the requirement is implemented.
+        Marks the requirement as implemented by storing the file paths where the requirement is implemented
+        and saving the current requirement text as the implemented text.
 
         Args:
             file_paths: List of file paths where the requirement is implemented
@@ -36,7 +35,6 @@ class ModelRequirement(BaseModel):
         assert file_paths, "At least one file path must be provided for implementation"
 
         self.implementation_file_paths = file_paths
-        self.implemented = True
         self.implemented_requirement_text = self.requirement_text
 
     def update_text(self, new_requirement_text: str) -> None:
@@ -47,14 +45,11 @@ class ModelRequirement(BaseModel):
         Args:
             new_requirement_text: The new requirement text
         """
-        if self.implemented and self.requirement_text == self.implemented_requirement_text:
+        # Store the current text as implemented if it matches the implemented text
+        if self.requirement_text == self.implemented_requirement_text:
             self.implemented_requirement_text = self.requirement_text
             
         self.requirement_text = new_requirement_text
-        
-        # If the requirement was implemented but the text changed, it's no longer implemented
-        if self.implemented_requirement_text and self.requirement_text != self.implemented_requirement_text:
-            self.implemented = False
 
     @property
     def state(self) -> RequirementState:
@@ -66,7 +61,7 @@ class ModelRequirement(BaseModel):
             RequirementState.UPDATED if a previous requirement text was implemented
             RequirementState.UNIMPLEMENTED if the requirement wasn't implemented at all
         """
-        if self.implemented:
+        if self.implemented_requirement_text == self.requirement_text:
             return RequirementState.IMPLEMENTED
         elif self.implemented_requirement_text:
             return RequirementState.UPDATED
