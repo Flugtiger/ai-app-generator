@@ -1,6 +1,7 @@
 import os
 from typing import List
 
+from model.model_requirement.model_requirement_id import ModelRequirementId
 from src.model.files.domain_model_files import DomainModelFiles
 from src.model.message.message import Message, MessageRole
 from src.model.model_requirement.model_requirement import ModelRequirement
@@ -94,9 +95,9 @@ class DomainModelGenerator:
 
         user_prompt += "\n\nThe requirement to be implemented:\n"
         user_prompt += f"{model_requirement.id}: {model_requirement.requirement_text}"
-        
-        user_prompt += "\n\nAfter implementing the requirement, please specify which files implement it by writing:"
-        user_prompt += "\n\"File <filepath> implements requirements <requirement-id>\""
+
+        user_prompt += "\n\nAfter implementing the requirement, please specify in which files it is implemented by writing:"
+        user_prompt += "\n\"Requirement <requirement-id> is implemented in:\n- <file-path-1>\n- <file-path-2>\n...\""
 
         # Create messages
         messages = [
@@ -108,7 +109,7 @@ class DomainModelGenerator:
         response_message = self.llm_service.generate_response(messages)
 
         # Parse files from response
-        files_dict, requirement_to_files = self.message_parser.apply_edits_from_message(response_message, existing_domain_model)
+        files_dict = self.message_parser.apply_edits_from_message(response_message, existing_domain_model)
 
         # Convert to DomainModelFiles
         domain_model_files = DomainModelFiles()
@@ -116,9 +117,11 @@ class DomainModelGenerator:
             if path.startswith('src/model'):
                 domain_model_files.add_file(path, content)
 
-        # Mark requirement as implemented
-        req_id_str = str(model_requirement.id)
-        if req_id_str in requirement_to_files:
-            model_requirement.implement(requirement_to_files[req_id_str])
+        # Mark the requirement as implemented
+        file_paths = self._get_file_paths_for_implemented_requirement(model_requirement, response_message)
+        model_requirement.implement(list(files_dict.get_all_files().keys()))
 
         return domain_model_files
+
+    def _get_file_paths_for_implemented_requirement(self, requirement: ModelRequirement, msg: Message):
+        pass
