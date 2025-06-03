@@ -1,0 +1,3 @@
+{
+  "requirementText": "A `ModelRequirement` can be updated by giving it a new description. The description that was implemented the last time is kept inside the `ModelRequirement` for traceability. The `ModelRequirement` provides its implementation state which can be 'implemented', 'updated' and 'unimplemented' depending on whether the current description has been implemented, an old description has been implemented or the requirement was not implemented at all yet."
+}

@@ -22,7 +22,8 @@ class ModelRequirement(BaseModel):
     id: Optional[ModelRequirementId] = None
     requirement_text: str = Field(..., description="The text describing the requirement")
     implementation_file_paths: List[str] = Field(default_factory=list)
-    implemented_requirement_text: Optional[str] = Field(default=None, description="The requirement text that was implemented")
+    implemented_requirement_text: Optional[str] = Field(
+        default=None, description="The requirement text that was implemented")
 
     def implement(self, file_paths: List[str]) -> None:
         """
@@ -45,17 +46,13 @@ class ModelRequirement(BaseModel):
         Args:
             new_requirement_text: The new requirement text
         """
-        # Store the current text as implemented if it matches the implemented text
-        if self.requirement_text == self.implemented_requirement_text:
-            self.implemented_requirement_text = self.requirement_text
-            
         self.requirement_text = new_requirement_text
 
     @property
     def state(self) -> RequirementState:
         """
         Returns the state of the requirement.
-        
+
         Returns:
             RequirementState.IMPLEMENTED if the current requirement text is implemented
             RequirementState.UPDATED if a previous requirement text was implemented

@@ -4,7 +4,7 @@ from typing import List
 from src.model.model_requirement.model_requirement_id import ModelRequirementId
 from src.model.files.domain_model_files import DomainModelFiles
 from src.model.message.message import Message, MessageRole
-from src.model.model_requirement.model_requirement import ModelRequirement
+from src.model.model_requirement.model_requirement import ModelRequirement, RequirementState
 from src.model.services.llm_service import LLMService
 from src.model.services.message_parser import MessageParser
 
@@ -97,17 +97,17 @@ class DomainModelGenerator:
         user_prompt += f"{model_requirement.id}: {model_requirement.requirement_text}"
 
         # Wenn die Anforderung aktualisiert wurde (vorherige Version wurde implementiert)
-        if model_requirement.state.value == "updated":
+        if model_requirement.state == RequirementState.UPDATED:
             user_prompt += "\n\nThis requirement was previously implemented with the following text:"
             user_prompt += f"\n{model_requirement.implemented_requirement_text}"
-            
+
             user_prompt += "\n\nThe requirement was previously implemented in these files:"
             for path in model_requirement.implementation_file_paths:
                 user_prompt += f"\n- {path}"
-            
+
             user_prompt += "\n\nPlease update the implementation to match the new requirement text."
 
-        user_prompt += "\n\nAfter implementing the requirement, please specify in which files it is implemented by writing:"
+        user_prompt += "\n\nAfter implementing the requirement, please specify in which files it is now implemented by writing:"
         user_prompt += "\n\"Requirement <requirement-id> is implemented in:\n- <file-path-1>\n- <file-path-2>\n...\""
 
         # Create messages
