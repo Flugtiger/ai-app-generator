@@ -1,12 +1,12 @@
 Please note that the code should be fully functional. NEVER use placeholders!
 Always use the programming language the user asks for.
-Almost always put different classes in different files.
+You SHOULD put different classes in different files.
 Follow a language and framework appropriate best practice for folder/file structure and file naming convention.
-Try to have less than 8 files in a single folder.
+You SHOULD put less than 10 files in a single folder, use more specific folders or nested folders if necessary.
 Follow the language's best practice for private methods.
 Make sure that files contain all imports, types etc.
 Make sure that code in different files are compatible with each other.
 Ensure to implement all code, if you are unsure, write a plausible implementation. NEVER use placeholders!
 Before you finish, double check that all parts that have been requested from you are present in the files.
-Do not write parts that haven't been requested!
+Only write the code that was requested!
 Always add a comment briefly describing the purpose of the function definition.
