@@ -1,19 +1,24 @@
 General requirements for a clean DDD model that you MUST follow:
 - use pydantics `BaseModel` as the base for all classes that need to be serialized (e.g. aggregates)
 - use pydantic V2 syntax
+- Classes whose objects are interchangeable if they contain the same values are 'Value Objects'. They MUST NOT contain an 'id' field. Two Value Objects are considered identical if they contain the same values.
+- Classes that have an identity that is separate from the values inside the class, are 'Entities'. Only Entities contain a field 'id'.
+- Entities can contain Value Objects and other Entities. This can form a tree structure. One such tree is called 'Aggregate'. The Entity at the root of the tree is called 'Aggregate Root'. All interactions with an Aggregate MUST happen through the Aggregate Root.
+- Classes that do not contain state but rather orchestrate actions between multiple Aggregates or Value Objects are Domain Services. Domain Services can reference each other to implement complex tasks.
+- When a Domain Service needs additional technology or an external service to do its task (i.e. its task is not part of the context of the application you are building), it should be abstract.
 - IDs have their own value object class that wraps a simple string
 - You MUST leave the ID empty when a new aggregate object is instantiated
 - The real ID for new objects is generated and set in the infrastructure code. You MUST NOT implement this logic as part of the domain model!
-- aggregates must only reference other aggregates via the ID of the aggregate root
+- Aggregates must only reference other Aggregates via the ID of the Aggregate Root
 - generate a Repository for each Aggregate
 - a Repository MUST be abstract (the implementation is not part of the model)
 - a Repository MUST have at least the methods `get_by_id`, `save` and `get_all`
-- if an object is to be created from an existing object, put a factory method in the class of the existing object, e.g. if a House is needed to create an Apartment, it should be possible to write: house.create_apartment(...), this factory method should call the constructor of the class of the object to be created, not another wrapper!
-- you MUST NOT generate arbitrary getters, setters or modification methods, if not absolutely necessary to fulfill the requirements or not explicitly mentioned
-- if there is a value object for a specific type of data, use it everywhere that data type is needed (method parameters, class fields, return types)
-- make assertions about the model state before the actual code in the model methods
+- if a new object of an Aggregate is to be created from an existing object of another Aggregate, put a factory method in the Aggregate class of the existing object, e.g. if a House is needed to create an Apartment, it should be possible to write: house.create_apartment(...), this factory method should call the constructor of the class of the object to be created, not another wrapper!
+- you MUST ONLY generate methods if absolutely necessary to fulfill the requirements or if explicitly mentioned
+- if there is a Value Object for a specific type of data, use it everywhere that data type is needed (method parameters, class fields, return types)
+- make assertions about the Aggregate state according to the business rules before the actual code in the methods of an Aggregate
 - use enums to restrict values
-- aggregates and value objects must not depend on or call domain services!
+- Aggregates and Value Objects must not depend on or call Domain Services!
 - you MUST NOT write any infrastructure code, example code or anything else that should not be part of a technology-free domain model
 - everything that can be implemented by using the base library of the programming language is considered as technology-free
 - you MUST NOT implement abstract(!) domain services since their implementation will be part of the infrastructure code
