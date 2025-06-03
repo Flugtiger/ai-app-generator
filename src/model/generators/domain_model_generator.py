@@ -1,4 +1,5 @@
 import os
+import re
 from typing import List
 
 from model.model_requirement.model_requirement_id import ModelRequirementId
