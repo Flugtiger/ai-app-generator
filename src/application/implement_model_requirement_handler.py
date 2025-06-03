@@ -47,7 +47,7 @@ class ImplementModelRequirementHandler:
         """
         Implements a single model requirement in the existing domain model.
         Reads the current domain model files, applies the requirement, and writes the updated files.
-        After implementation, marks the requirement as implemented.
+        The domain model generator marks the requirement as implemented with the correct file paths.
         """
         # Get the requirement from the repository
         requirement_id = ModelRequirementId(value=input_dto.requirementId)
@@ -62,8 +62,7 @@ class ImplementModelRequirementHandler:
         # Write the updated domain model files
         self.domain_model_files_service.write_files(input_dto.targetDirectory, updated_domain_model)
 
-        # Mark the requirement as implemented
-        requirement.implement(list(updated_domain_model.get_all_files().keys()))
+        # Save the requirement to persist its implementation status
         self.model_requirement_repository.save(requirement)
 
         # Return the number of modified files

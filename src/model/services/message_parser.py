@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
+from typing import Dict, List, Tuple
 
 from src.model.files.files_dictionary import FilesDictionary
 from src.model.message.message import Message
+from src.model.model_requirement.model_requirement_id import ModelRequirementId
 
 
 class MessageParser(ABC):
@@ -17,9 +19,11 @@ class MessageParser(ABC):
         pass
     
     @abstractmethod
-    def parse_files_from_message(self, message: Message) -> FilesDictionary:
+    def parse_files_from_message(self, message: Message) -> Tuple[FilesDictionary, Dict[str, List[str]]]:
         """
-        Parses a LLM response message and returns a FilesDictionary with the parsed files.
+        Parses a LLM response message and returns a tuple containing:
+        1. A FilesDictionary with the parsed files
+        2. A dictionary mapping requirement IDs to lists of file paths that implement them
         """
         pass
     
@@ -31,9 +35,11 @@ class MessageParser(ABC):
         pass
     
     @abstractmethod
-    def apply_edits_from_message(self, message: Message, files_dict: FilesDictionary) -> FilesDictionary:
+    def apply_edits_from_message(self, message: Message, files_dict: FilesDictionary) -> Tuple[FilesDictionary, Dict[str, List[str]]]:
         """
         Parses a LLM response message for file edits and applies them to the provided FilesDictionary.
-        Returns the updated FilesDictionary.
+        Returns a tuple containing:
+        1. The updated FilesDictionary
+        2. A dictionary mapping requirement IDs to lists of file paths that implement them
         """
         pass

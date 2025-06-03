@@ -47,8 +47,8 @@ class DomainModelGenerator:
 
         # Prepare user prompt with requirements
         user_prompt = "The requirements:\n"
-        for i, req in enumerate(model_requirements, 1):
-            user_prompt += f"{req.requirement_text}\n"
+        for req in model_requirements:
+            user_prompt += f"{req.id}: {req.requirement_text}\n"
 
         # Create messages
         messages = [
@@ -60,13 +60,19 @@ class DomainModelGenerator:
         response_message = self.llm_service.generate_response(messages)
 
         # Parse files from response
-        files_dict = self.message_parser.parse_files_from_message(response_message)
+        files_dict, requirement_to_files = self.message_parser.parse_files_from_message(response_message)
 
         # Convert to DomainModelFiles
         domain_model_files = DomainModelFiles()
         for path, content in files_dict.get_all_files().items():
             if path.startswith('src/model'):
                 domain_model_files.add_file(path, content)
+
+        # Mark requirements as implemented
+        for req in model_requirements:
+            req_id_str = str(req.id)
+            if req_id_str in requirement_to_files:
+                req.implement(requirement_to_files[req_id_str])
 
         return domain_model_files
 
@@ -88,6 +94,9 @@ class DomainModelGenerator:
 
         user_prompt += "\n\nThe requirement to be implemented:\n"
         user_prompt += f"{model_requirement.id}: {model_requirement.requirement_text}"
+        
+        user_prompt += "\n\nAfter implementing the requirement, please specify which files implement it by writing:"
+        user_prompt += "\n\"File <filepath> implements requirements <requirement-id>\""
 
         # Create messages
         messages = [
@@ -99,12 +108,17 @@ class DomainModelGenerator:
         response_message = self.llm_service.generate_response(messages)
 
         # Parse files from response
-        files_dict = self.message_parser.apply_edits_from_message(response_message, existing_domain_model)
+        files_dict, requirement_to_files = self.message_parser.apply_edits_from_message(response_message, existing_domain_model)
 
         # Convert to DomainModelFiles
         domain_model_files = DomainModelFiles()
         for path, content in files_dict.get_all_files().items():
             if path.startswith('src/model'):
                 domain_model_files.add_file(path, content)
+
+        # Mark requirement as implemented
+        req_id_str = str(model_requirement.id)
+        if req_id_str in requirement_to_files:
+            model_requirement.implement(requirement_to_files[req_id_str])
 
         return domain_model_files

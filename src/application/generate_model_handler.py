@@ -46,7 +46,7 @@ class GenerateModelHandler:
         """
         Generates domain model files based on model requirements.
         By default, only uses unimplemented requirements unless useAllRequirements is True.
-        After generation, marks all used requirements as implemented.
+        The domain model generator marks requirements as implemented with the correct file paths.
         """
         # Get model requirements from the repository based on the flag
         if input_dto.useAllRequirements:
@@ -60,18 +60,11 @@ class GenerateModelHandler:
         # Write the domain model files to the target directory
         self.domain_model_files_service.write_files(input_dto.targetDirectory, domain_model_files)
 
-        # Mark all used requirements as implemented
-        self._mark_requirements_as_implemented(model_requirements)
+        # Save all requirements to persist their implementation status
+        for requirement in model_requirements:
+            self.model_requirement_repository.save(requirement)
 
         # Return the number of generated files
         return GenerateModelOutput(
             numberOfFiles=len(domain_model_files.get_all_files())
         )
-
-    def _mark_requirements_as_implemented(self, requirements: List[ModelRequirement]) -> None:
-        """
-        Marks all requirements in the list as implemented and saves them to the repository
-        """
-        for requirement in requirements:
-            requirement.implement(["dummy"])
-            self.model_requirement_repository.save(requirement)
