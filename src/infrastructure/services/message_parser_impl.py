@@ -183,7 +183,7 @@ class MessageParserImpl(MessageParser):
         except Exception as e:
             raise ValueError(f"Failed to parse message: {str(e)}")
 
-    def apply_edits_from_message(self, message: Message, files_dict: FilesDictionary) -> FilesDictionary:
+    def apply_edits_from_message(self, message: Message, files_dict: FilesDictionary) -> Tuple[FilesDictionary, Dict[str, List[str]]]:
         """
         Parses a LLM response message for file edits and applies them to the provided FilesDictionary.
         Returns the updated FilesDictionary.
@@ -216,6 +216,44 @@ class MessageParserImpl(MessageParser):
                 else:
                     raise ValueError(f"Search block not found in file: {filepath}")
 
-            return updated_files_dict
+            # Extract requirement IDs from the message
+            requirement_to_files = self._extract_requirement_ids_from_message(message)
+            
+            return updated_files_dict, requirement_to_files
         except Exception as e:
             raise ValueError(f"Failed to apply edits from message: {str(e)}")
+    def _extract_requirement_ids_from_message(self, message: Message) -> Dict[str, List[str]]:
+        """
+        Extract requirement IDs from the message content.
+        Returns a dictionary mapping requirement IDs to lists of file paths.
+        """
+        requirement_to_files: Dict[str, List[str]] = {}
+        
+        # Look for patterns like "Requirement REQ001 is implemented in:" followed by a list
+        req_pattern = r"Requirement\s+([A-Za-z0-9]+)\s+is\s+implemented\s+in:"
+        for match in re.finditer(req_pattern, message.content, re.IGNORECASE):
+            req_id = match.group(1).strip()
+            if req_id not in requirement_to_files:
+                requirement_to_files[req_id] = []
+            
+            # Find the list items that follow
+            start_pos = match.end()
+            list_items = re.findall(r"-\s*([^\n]+)", message.content[start_pos:], re.MULTILINE)
+            
+            for item in list_items:
+                filepath = item.strip()
+                requirement_to_files[req_id].append(filepath)
+        
+        # Also look for patterns like "File X implements requirement REQ001"
+        file_pattern = r"(?:file|File)\s+([^\s]+)\s+implements\s+requirements?\s+((?:[A-Za-z0-9]+(?:,\s*)?)+)"
+        for match in re.finditer(file_pattern, message.content, re.IGNORECASE):
+            filepath = match.group(1).strip()
+            req_ids_str = match.group(2)
+            req_ids = [req_id.strip() for req_id in req_ids_str.split(',')]
+            
+            for req_id in req_ids:
+                if req_id not in requirement_to_files:
+                    requirement_to_files[req_id] = []
+                requirement_to_files[req_id].append(filepath)
+        
+        return requirement_to_files

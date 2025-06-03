@@ -119,9 +119,41 @@ class DomainModelGenerator:
 
         # Mark the requirement as implemented
         file_paths = self._get_file_paths_for_implemented_requirement(model_requirement, response_message)
-        model_requirement.implement(list(files_dict.get_all_files().keys()))
+        if file_paths:
+            model_requirement.implement(file_paths)
+        else:
+            # Fallback: use all files if no specific files were mentioned
+            model_requirement.implement(list(files_dict.get_all_files().keys()))
 
         return domain_model_files
 
-    def _get_file_paths_for_implemented_requirement(self, requirement: ModelRequirement, msg: Message):
-        pass
+    def _get_file_paths_for_implemented_requirement(self, requirement: ModelRequirement, msg: Message) -> List[str]:
+        """
+        Extracts the file paths where a requirement is implemented from the message content.
+        
+        Args:
+            requirement: The requirement to look for
+            msg: The message to parse
+            
+        Returns:
+            A list of file paths where the requirement is implemented
+        """
+        req_id_str = str(requirement.id)
+        file_paths = []
+        
+        # Look for patterns like "Requirement REQ001 is implemented in:" followed by a list
+        pattern = rf"Requirement\s+{re.escape(req_id_str)}\s+is\s+implemented\s+in:\s*(?:\n\s*-\s*([^\n]+))+?"
+        match = re.search(pattern, msg.content, re.IGNORECASE)
+        
+        if match:
+            # Extract all file paths from the list
+            list_pattern = rf"Requirement\s+{re.escape(req_id_str)}\s+is\s+implemented\s+in:(?:\s*\n\s*-\s*([^\n]+))+"
+            file_matches = re.findall(r"-\s*([^\n]+)", msg.content[match.start():])
+            file_paths.extend([path.strip() for path in file_matches])
+        
+        # Also look for alternative formats like "File X implements requirement REQ001"
+        alt_pattern = rf"(?:file|File)\s+([^\s]+)\s+implements\s+requirements?\s+(?:.*?{re.escape(req_id_str)})"
+        alt_matches = re.findall(alt_pattern, msg.content, re.IGNORECASE)
+        file_paths.extend([path.strip() for path in alt_matches])
+        
+        return file_paths
