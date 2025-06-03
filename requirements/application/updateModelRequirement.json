@@ -1,0 +1,4 @@
+{
+  "name": "updateModelRequirement",
+  "description": "As a User I can update a single model requirement by specifying its ID and the new requirement text."
+}
