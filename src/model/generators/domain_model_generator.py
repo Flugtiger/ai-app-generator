@@ -96,6 +96,17 @@ class DomainModelGenerator:
         user_prompt += "\n\nThe requirement to be implemented:\n"
         user_prompt += f"{model_requirement.id}: {model_requirement.requirement_text}"
 
+        # Wenn die Anforderung aktualisiert wurde (vorherige Version wurde implementiert)
+        if model_requirement.state.value == "updated":
+            user_prompt += "\n\nThis requirement was previously implemented with the following text:"
+            user_prompt += f"\n{model_requirement.implemented_requirement_text}"
+            
+            user_prompt += "\n\nThe requirement was previously implemented in these files:"
+            for path in model_requirement.implementation_file_paths:
+                user_prompt += f"\n- {path}"
+            
+            user_prompt += "\n\nPlease update the implementation to match the new requirement text."
+
         user_prompt += "\n\nAfter implementing the requirement, please specify in which files it is implemented by writing:"
         user_prompt += "\n\"Requirement <requirement-id> is implemented in:\n- <file-path-1>\n- <file-path-2>\n...\""
 
