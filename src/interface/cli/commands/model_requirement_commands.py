@@ -1,6 +1,7 @@
 import click
 
 from src.application.create_model_requirement_handler import CreateModelRequirementHandler, CreateModelRequirementInput
+from src.application.get_model_requirement_handler import GetModelRequirementHandler, GetModelRequirementInput
 from src.application.implement_model_requirement_handler import ImplementModelRequirementHandler, ImplementModelRequirementInput
 from src.application.update_model_requirement_handler import UpdateModelRequirementHandler, UpdateModelRequirementInput
 from src.interface.cli.dependency_injection import (
@@ -67,6 +68,32 @@ def update_model_requirement(id: str, text: str):
     # Output result
     click.echo(f"Model requirement {result.modelRequirementId} updated successfully.")
     click.echo(f"Current state: {result.state}")
+
+
+@model_requirement_group.command(name="get")
+@click.option("--id", "-i", required=True, help="The ID of the model requirement to retrieve")
+def get_model_requirement(id: str):
+    """
+    Retrieve a model requirement by its ID.
+    """
+    # Get dependencies
+    model_requirement_repository = get_model_requirement_repository()
+
+    # Create handler
+    handler = GetModelRequirementHandler(model_requirement_repository)
+
+    # Create input DTO
+    input_dto = GetModelRequirementInput(
+        modelRequirementId=id
+    )
+
+    # Execute handler
+    result = handler.handle(input_dto)
+
+    # Output result
+    click.echo(f"Model Requirement ID: {result.modelRequirementId}")
+    click.echo(f"Text: {result.requirementText}")
+    click.echo(f"State: {result.state}")
 
 
 @model_requirement_group.command(name="implement")
