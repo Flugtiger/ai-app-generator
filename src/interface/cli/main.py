@@ -36,14 +36,14 @@ def main():
     # Initialisiere das Logging-Framework
     log_file = os.path.join(os.getcwd(), "application.log")
     setup_logging(log_file=log_file)
-    
-    logging.info("Anwendung gestartet")
-    
+
+    logging.info("Application started")
+
     try:
         cli()
-        logging.info("Anwendung erfolgreich beendet")
+        logging.info("Application stopped successfully")
     except Exception as e:
-        error_msg = f"Fehler: {str(e)}"
+        error_msg = f"Error: {str(e)}"
         logging.error(error_msg, exc_info=True)
         click.echo(error_msg, err=True)
         click.echo("\nStack trace:", err=True)

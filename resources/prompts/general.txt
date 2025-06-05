@@ -1,7 +1,6 @@
 Please note that the code should be fully functional. NEVER use placeholders!
 Always use the programming language the user asks for.
 You SHOULD put different classes in different files.
-Follow a language and framework appropriate best practice for folder/file structure and file naming convention.
 You SHOULD put less than 10 files in a single folder, use more specific folders or nested folders if necessary.
 Follow the language's best practice for private methods.
 Make sure that files contain all imports, types etc.
