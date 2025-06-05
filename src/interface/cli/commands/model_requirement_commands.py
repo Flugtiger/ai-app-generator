@@ -90,10 +90,14 @@ def get_model_requirement(id: str):
     # Execute handler
     result = handler.handle(input_dto)
 
-    # Output result
-    click.echo(f"Model Requirement ID: {result.modelRequirementId}")
-    click.echo(f"Text: {result.requirementText}")
-    click.echo(f"State: {result.state}")
+    # Output result as JSON
+    import json
+    json_output = json.dumps({
+        "modelRequirementId": result.modelRequirementId,
+        "requirementText": result.requirementText,
+        "state": result.state
+    }, indent=2)
+    click.echo(json_output)
 
 
 @model_requirement_group.command(name="implement")
